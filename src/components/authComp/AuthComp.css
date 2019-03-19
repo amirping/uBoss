@@ -1,0 +1,8 @@
+.btn-forget {
+    border: none;
+    color: fuchsia;
+}
+
+.fill-space {
+    flex-grow: 1;
+}

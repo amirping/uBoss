@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import "./AuthComp.css";
 import bgAuth from "./bg_auth_1.jpg";
 import {
   Box,
@@ -23,6 +24,9 @@ class AuthComp extends Component<AuthCompProps, AuthCompState> {
   }
   changeView = (view: number) => {
     return this.setState({ step: view });
+  };
+  signUp = (params: any) => {
+    console.log(params);
   };
 
   render() {
@@ -58,36 +62,44 @@ class AuthComp extends Component<AuthCompProps, AuthCompState> {
                     </Text>
                     <Form
                       messages={{
-                        invalid: "it look like you miss something there",
-                        required: "this field actually is required"
-                      }}>
-                      <FormField name="name" label="Name" pad={true} required />
-                      <FormField name="email" label="Email" required>
-                        <TextInput
-                          type="email"
-                          size="small"
-                          placeholder="your email"
-                        />
-                      </FormField>
+                        invalid: "Wrong value has been given",
+                        required: "this field is required"
+                      }}
+                      onSubmit={this.signUp}>
                       <FormField
-                        typeof="password"
-                        name="password"
-                        label="Password"
-                        required>
-                        <TextInput
-                          type="password"
-                          placeholder="give a strong one"
-                        />
-                      </FormField>
+                        name="name"
+                        label="Name"
+                        required
+                        validate={{ regexp: /^[a-z]/i }}
+                      />
                       <FormField
-                        name="password_confirmation"
-                        label="Password confirmation"
-                        required>
-                        <TextInput
-                          type="password"
-                          placeholder="confirm the password"
+                        label="Email"
+                        name="email"
+                        required
+                        {...{ type: "email" }}
+                      />
+                      <Box
+                        direction="row-responsive"
+                        fill="horizontal"
+                        align="stretch"
+                        justify="between"
+                        gap="small">
+                        <FormField
+                          name="password"
+                          label="Password"
+                          required
+                          className="fill-space"
+                          {...{ type: "password", min: "6" }}
                         />
-                      </FormField>
+                        <FormField
+                          name="password_confirmation"
+                          label="Password confirmation"
+                          required
+                          className="fill-space"
+                          {...{ type: "password" }}
+                        />
+                      </Box>
+
                       <Box direction="row" justify="between">
                         <Box direction="row-responsive">
                           <Button onClick={() => this.changeView(2)}>
@@ -148,12 +160,16 @@ class AuthComp extends Component<AuthCompProps, AuthCompState> {
                             }}>
                             I don't have an account!
                           </Button>
-                          <Button>I forget my password !</Button>
+                          <Button
+                            plain
+                            label=" I forget my password !"
+                            className="btn-forget"
+                          />
                         </Box>
                         <Button
                           type="submit"
                           primary
-                          label="Sign me up"
+                          label="Log-In"
                           alignSelf="end"
                         />
                       </Box>

@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Grommet, Box, Heading } from "grommet";
 import AppBar from "./components/appBar/appBar";
 import AuthComp from "./components/authComp/AuthComp";
+import InApp from "./components/inApp/InApp";
 const theme = {
   global: {
     colors: {
@@ -19,8 +20,9 @@ class App extends Component {
     return (
       <Grommet theme={theme} full>
         <Box fill>
-          <AppBar />
-          <AuthComp />
+          {/* <AppBar />
+          <AuthComp /> */}
+          <InApp />
         </Box>
       </Grommet>
     );
