@@ -4,3 +4,35 @@
     width: 60px;
     text-align: center;
 }
+
+.add-field {
+    padding: "2px 4px";
+    display: "flex";
+    justify-items: "center";
+    width: 400
+}
+
+.add-f-input {
+    margin-left: 8;
+    flex: 1
+}
+
+.add-f-iconButton {
+    padding: 10
+}
+
+.dashboard-item {
+    height: 60px;
+    width: 60px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+    color: white;
+    background: #4183d7;
+    border-radius: 50%;
+    cursor: pointer;
+    user-select: none;
+}

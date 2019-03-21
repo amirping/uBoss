@@ -1,0 +1,14 @@
+.dash-name {
+    text-decoration: underline;
+    overflow: visible;
+}
+
+.list-main {
+    min-width: 200px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.20);
+}
+
+.dash-lists {
+    flex-flow: wrap;
+    overflow-y: scroll;
+}

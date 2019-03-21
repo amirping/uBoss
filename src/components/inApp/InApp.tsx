@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Box } from "grommet";
+import { Box, ResponsiveContext, Collapsible } from "grommet";
 import Dashboard from "../dashboard/Dashboard";
 import Dashboards from "../dashboards/Dashboards";
 import AppBar from "../appBar/appBar";
@@ -18,13 +18,19 @@ class InApp extends Component<InAppProps, InAppState> {
   }
   render() {
     return (
-      <Box direction="column" fill>
-        <AppBar />
-        <Box direction="row-responsive" fill background="dark-3">
-          <Dashboards />
-          <Dashboard />
-        </Box>
-      </Box>
+      <ResponsiveContext.Consumer>
+        {size => (
+          <Box direction="column" fill>
+            <AppBar />
+            <Box direction="row" fill="vertical" background="dark-1">
+              <Collapsible open={size != "small"} direction="horizontal">
+                <Dashboards />
+              </Collapsible>
+              <Dashboard />
+            </Box>
+          </Box>
+        )}
+      </ResponsiveContext.Consumer>
     );
   }
 }
