@@ -3,6 +3,7 @@ import { Box, Text, Heading } from "grommet";
 import { IconButton, Icon } from "@material-ui/core";
 import EditIcon from "@material-ui/icons/Edit";
 import "./Dashboard.css";
+import ListItem from "../list/ListItem";
 export interface DashboardProps {}
 
 export interface DashboardState {
@@ -44,8 +45,8 @@ class Dashboard extends Component<DashboardProps, DashboardState> {
       </Box>
     );
   };
-  dashRender = () => {
-    const lists = this.state.data.lists.map(this.listRender);
+  DashRender = () => {
+    //const lists = this.state.data.lists.map(<ListItem />);
     return (
       <Box direction="column" fill>
         <Box
@@ -70,7 +71,9 @@ class Dashboard extends Component<DashboardProps, DashboardState> {
           pad="small"
           gap="20px"
           fill>
-          {lists}
+          {this.state.data.lists.map((list: any) => (
+            <ListItem key={list.key} />
+          ))}
         </Box>
       </Box>
     );
@@ -80,7 +83,7 @@ class Dashboard extends Component<DashboardProps, DashboardState> {
     return (
       <Box direction="row" fill background="dark-2">
         {this.state.data && this.state.data != null ? (
-          <this.dashRender />
+          <this.DashRender />
         ) : (
           <Box>
             <Text>

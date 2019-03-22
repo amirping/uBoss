@@ -1,0 +1,18 @@
+.label {
+    padding-left: 8px;
+    padding-right: 8px;
+    color: black;
+    border-radius: 5px
+}
+
+.label-red {
+    background: #f03434;
+}
+
+.label-green {
+    background: #3fc380;
+}
+
+.label-blue {
+    background: #1e8bc3;
+}

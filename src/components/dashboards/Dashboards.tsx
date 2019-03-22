@@ -78,6 +78,14 @@ class Dashboards extends Component<DashboardsProps, DashboardsState> {
       this.setState({
         dashboardsList: dashs
       });
+      this.setState({
+        dashToCreate: {
+          name: "",
+          description: "",
+          lists: []
+        },
+        listAdder: ""
+      });
       // proced API
     }
   };
