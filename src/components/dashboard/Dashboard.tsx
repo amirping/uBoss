@@ -4,6 +4,7 @@ import { IconButton, Icon } from "@material-ui/core";
 import EditIcon from "@material-ui/icons/Edit";
 import "./Dashboard.css";
 import ListItem from "../list/ListItem";
+import DashboardConfig from "../dashboardConfig/DashboardConfig";
 export interface DashboardProps {}
 
 export interface DashboardState {
@@ -58,9 +59,7 @@ class Dashboard extends Component<DashboardProps, DashboardState> {
           <Text size="xxlarge" truncate={true} className="dash-name">
             {this.state.data.name}
           </Text>
-          <IconButton>
-            <EditIcon fontSize="small" />
-          </IconButton>
+          <DashboardConfig />
         </Box>
         <Box
           className="dash-lists"
