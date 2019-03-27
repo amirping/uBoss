@@ -70,11 +70,14 @@ class DashboardConfig extends Component<
               title: "Dashboard jsProject",
               loaded_lists: {
                 "l-114": {
+                  id: "l-144",
                   name: "ready",
                   transformTo: ""
                 },
                 "l-555": {
-                  name: "to be done"
+                  id: "l-555",
+                  name: "to be done",
+                  transformTo: ""
                 }
               }
             },
@@ -84,7 +87,9 @@ class DashboardConfig extends Component<
               title: "Dashboard javaProject",
               loaded_lists: {
                 "l-21234": {
-                  name: "finish"
+                  name: "finish",
+                  id: "l-21234",
+                  transformTo: ""
                 }
               }
             },
@@ -94,13 +99,19 @@ class DashboardConfig extends Component<
               title: "Dashboard cProject",
               loaded_lists: {
                 "l-88": {
-                  name: "finished"
+                  name: "finished",
+                  id: "l-88",
+                  transformTo: ""
                 },
                 "l-9775": {
-                  name: "ready"
+                  name: "ready",
+                  id: "l-9775",
+                  transformTo: ""
                 },
                 "l-6654": {
-                  name: "close"
+                  name: "close",
+                  id: "l-6654",
+                  transformTo: ""
                 }
               }
             }
@@ -110,19 +121,13 @@ class DashboardConfig extends Component<
     };
   }
   handleClose = () => {
-    this.setState({
-      show: false
-    });
+    this.setState({ show: false });
   };
   handleOpen = () => {
-    this.setState({
-      show: true
-    });
+    this.setState({ show: true });
   };
   updateListAdder = (params: any) => {
-    this.setState({
-      listAdder: params.target.value
-    });
+    this.setState({ listAdder: params.target.value });
   };
   handleAddList = () => {
     if (this.state.listAdder.length === 0) {
@@ -130,17 +135,18 @@ class DashboardConfig extends Component<
       return false;
     }
     var listIs = {
-      key: this.state.listAdder,
+      id: this.state.listAdder,
       title: this.state.listAdder
     };
-    var allk = this.state.dashboardData.lists.filter((obj: any) => {
-      return obj.title === this.state.listAdder;
+    var allk = this.state.dashboardData.listsIds.filter((obj: any) => {
+      return obj === this.state.listAdder;
     });
     if (allk.length != 0) {
       console.log("already exist");
     } else {
       var newValues = this.state.dashboardData;
-      newValues.lists.push(listIs);
+      newValues.lists[listIs.id] = listIs;
+      newValues.listsIds.push(listIs.id);
       console.log(newValues);
       this.setState({
         // add list to lists
@@ -149,16 +155,28 @@ class DashboardConfig extends Component<
       });
     }
   };
+  handleChangeTransform = (event: any, sourceListId: any, dashboardId: any) => {
+    let newData = this.state.dashboardData;
+    newData.loaded_dashboards.dashboards[dashboardId].loaded_lists[
+      sourceListId
+    ].transformTo = event.target.value;
+    this.setState({ dashboardData: newData });
+  };
+
   AddField = () => {
     return (
       <Box
-        style={{ zIndex: 1 }}
+        style={{
+          zIndex: 1
+        }}
         direction="row"
         elevation="small"
         background="light-3"
         round="xsmall"
         border="all"
-        pad={{ left: "small" }}>
+        pad={{
+          left: "small"
+        }}>
         <InputBase
           className="add-f-input"
           placeholder="A lidt name to be created"
@@ -265,7 +283,7 @@ class DashboardConfig extends Component<
                         const dash = this.state.dashboardData.loaded_dashboards
                           .dashboards[id];
                         return (
-                          <ExpansionPanel>
+                          <ExpansionPanel key={id}>
                             <ExpansionPanelSummary
                               expandIcon={<ExpandMoreIcon />}>
                               <Typography>{dash.title}</Typography>
@@ -280,7 +298,7 @@ class DashboardConfig extends Component<
                                 {dash.listsIds.map((listID: any) => {
                                   const list = dash.loaded_lists[listID];
                                   return (
-                                    <React.Fragment>
+                                    <React.Fragment key={listID}>
                                       <Box
                                         pad="xsmall"
                                         gap="small"
@@ -310,13 +328,27 @@ class DashboardConfig extends Component<
                                         </Box>
                                         <Box flex>
                                           <Select
+                                            onChange={event =>
+                                              this.handleChangeTransform(
+                                                event,
+                                                listID,
+                                                dash.id
+                                              )
+                                            }
+                                            inputProps={{
+                                              id: list.id
+                                            }}
                                             input={
                                               <OutlinedInput
                                                 name="Load into"
+                                                id="jkjsdkjfnsdkjnf"
                                                 labelWidth={150}
+                                                inputProps={{
+                                                  id: listID
+                                                }}
                                               />
                                             }
-                                            value={list.transformTo}>
+                                            value={list.transformTo || ""}>
                                             <MenuItem value="">
                                               <em>None</em>
                                             </MenuItem>
@@ -325,7 +357,9 @@ class DashboardConfig extends Component<
                                                 const li = this.state
                                                   .dashboardData.lists[liID];
                                                 return (
-                                                  <MenuItem value={li.id}>
+                                                  <MenuItem
+                                                    key={li.id}
+                                                    value={li.id}>
                                                     {li.title}
                                                   </MenuItem>
                                                 );
@@ -341,7 +375,7 @@ class DashboardConfig extends Component<
                               </Box>
                             </ExpansionPanelDetails>
                             <ExpansionPanelActions>
-                              <Button variant="raised" color="primary">
+                              <Button variant="contained" color="primary">
                                 Save transformt
                               </Button>
                             </ExpansionPanelActions>
