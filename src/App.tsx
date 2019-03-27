@@ -46,9 +46,6 @@ class App extends Component<AppProps, AppState> {
       <Grommet theme={theme} full>
         <Box fill>
           <Router>
-            {/*
-          <AuthComp /> */}
-            {/* <InApp /> */}
             <Switch>
               <Route exact path="/" component={Home} />
               <Route
