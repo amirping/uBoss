@@ -4,21 +4,16 @@ import { IconButton, MenuItem, Menu } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
 
 import UserProfile from "../userProfile/UserProfile";
+import { connect } from "react-redux";
+import { toggleSide } from "../../actions";
 export interface AppBarProps {}
 
-export interface AppBarState {
-  connected: Boolean;
-}
+export interface AppBarState {}
 
-class AppBar extends Component<AppBarProps, AppBarState> {
-  constructor(props: AppBarProps) {
+class AppBar extends Component<any, AppBarState> {
+  constructor(props: any) {
     super(props);
-    this.state = { connected: true };
   }
-
-  toggleMenu = () => {
-    return null;
-  };
 
   render() {
     return (
@@ -39,7 +34,7 @@ class AppBar extends Component<AppBarProps, AppBarState> {
                 <IconButton
                   disableRipple={true}
                   onClick={() => {
-                    this.toggleMenu;
+                    this.props.toogleSide();
                   }}>
                   <MenuIcon />
                 </IconButton>
@@ -48,11 +43,9 @@ class AppBar extends Component<AppBarProps, AppBarState> {
                 uBoos
               </Text>
             </Box>
-            {this.state.connected && (
-              <Box>
-                <UserProfile />
-              </Box>
-            )}
+            <Box>
+              <UserProfile />
+            </Box>
           </Box>
         )}
       </ResponsiveContext.Consumer>
@@ -60,4 +53,13 @@ class AppBar extends Component<AppBarProps, AppBarState> {
   }
 }
 
-export default AppBar;
+function mapDispatchToProps(dispatch: any) {
+  return {
+    toogleSide: () => dispatch(toggleSide())
+  };
+}
+
+export default connect(
+  null,
+  mapDispatchToProps
+)(AppBar);

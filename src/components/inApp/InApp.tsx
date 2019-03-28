@@ -3,15 +3,13 @@ import { Box, ResponsiveContext, Collapsible } from "grommet";
 import Dashboard from "../dashboard/Dashboard";
 import Dashboards from "../dashboards/Dashboards";
 import AppBar from "../appBar/appBar";
+import { connect } from "react-redux";
 
 export interface InAppProps {}
 
-export interface InAppState {
-  connected: Boolean;
-  user: {};
-}
+export interface InAppState {}
 
-class InApp extends Component<InAppProps, InAppState> {
+class InApp extends Component<any, InAppState> {
   constructor(props: InAppProps) {
     super(props);
     this.state = { connected: false, user: {} };
@@ -23,7 +21,9 @@ class InApp extends Component<InAppProps, InAppState> {
           <Box direction="column" fill>
             <AppBar />
             <Box direction="row" fill="vertical" background="dark-1">
-              <Collapsible open={size != "small"} direction="horizontal">
+              <Collapsible
+                open={size != "small" || this.props.sideMenu}
+                direction="horizontal">
                 <Dashboards />
               </Collapsible>
               <Dashboard />
@@ -34,5 +34,15 @@ class InApp extends Component<InAppProps, InAppState> {
     );
   }
 }
+const mapStateToProps = (state: any) => {
+  return {
+    sideMenu: state.sideMenu
+  };
+};
 
-export default InApp;
+const mapDispatchToProps = {};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(InApp);

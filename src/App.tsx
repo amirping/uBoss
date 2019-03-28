@@ -5,12 +5,12 @@ import InApp from "./components/inApp/InApp";
 import {
   BrowserRouter as Router,
   Route,
-  Link,
   Switch,
   Redirect
 } from "react-router-dom";
 import NoMatch from "./components/noMatch/NoMatch";
 import Home from "./components/home/Home";
+import { connect } from "react-redux";
 const theme = {
   global: {
     colors: {
@@ -23,24 +23,25 @@ const theme = {
     }
   }
 };
+
 export interface AppProps {}
 
 export interface AppState {
   connected: Boolean;
 }
-class App extends Component<AppProps, AppState> {
-  constructor(props: AppProps) {
+class App extends Component<any, AppState> {
+  constructor(props: any) {
     super(props);
     this.state = { connected: false };
   }
-  componentDidMount() {
-    let token = localStorage.getItem("token");
-    if (token) {
-      this.setState({ connected: true });
-    } else {
-      this.setState({ connected: false });
-    }
-  }
+  // componentDidMount() {
+  //   let token = localStorage.getItem("token");
+  //   if (token) {
+  //     this.setState({ connected: true });
+  //   } else {
+  //     this.setState({ connected: true }); // only for test -> true
+  //   }
+  // }
   render() {
     return (
       <Grommet theme={theme} full>
@@ -52,14 +53,14 @@ class App extends Component<AppProps, AppState> {
                 exact
                 path="/in"
                 render={() =>
-                  this.state.connected ? <InApp /> : <Redirect to="/auth" />
+                  this.props.connected ? <InApp /> : <Redirect to="/auth" />
                 }
               />
               <Route
                 exact
                 path="/auth"
                 render={() =>
-                  !this.state.connected ? <AuthComp /> : <Redirect to="/in" />
+                  !this.props.connected ? <AuthComp /> : <Redirect to="/in" />
                 }
               />
               <Route component={NoMatch} />
@@ -70,4 +71,13 @@ class App extends Component<AppProps, AppState> {
     );
   }
 }
-export default App;
+const mapStateToProps = (state: any) => {
+  return {
+    connected: state.connected
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  null
+)(App);
