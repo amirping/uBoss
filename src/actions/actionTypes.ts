@@ -1,1 +1,9 @@
 export const TOGGLE_SIDE = "TOGGLE_SIDE";
+export const LOGIN = "LOGIN";
+export const SIGNUP = "SIGNUP";
+export const LOGOUT = "LOGOUT";
+export const SELECT_DASHBOARD = "SELECT_DASHBOARD";
+export const CREATE_DASHBOARD = "CREATE_DASHBOARD";
+export const ADD_LIST = "ADD_LIST";
+export const IMPORT_DASHBOARD = "IMOPRT_DASHBOARD";
+export const IMPORT_LIST = "IMPORT_LIST";
