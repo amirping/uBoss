@@ -25,7 +25,10 @@ import {
 export interface DashboardsProps {}
 
 export interface DashboardsState {
-  dashboardsList: Array<{}>;
+  dashboardsList: {
+    dashboardsIds: Array<string>;
+    dashboards: any;
+  };
   open_creator: boolean;
   dashToCreate: {
     name: "";
@@ -36,12 +39,15 @@ export interface DashboardsState {
 }
 
 class Dashboards extends Component<DashboardsProps, DashboardsState> {
-  name: any;
-  descrp: any;
+  _name: any;
+  _descrp: any;
   constructor(props: DashboardsProps) {
     super(props);
     this.state = {
-      dashboardsList: [],
+      dashboardsList: {
+        dashboardsIds: [],
+        dashboards: {}
+      },
       open_creator: false,
       dashToCreate: {
         name: "",
@@ -60,8 +66,8 @@ class Dashboards extends Component<DashboardsProps, DashboardsState> {
   handleCreate = (params: any) => {
     console.log(params);
     // check if we have at least a list then create
-    var name = this.name.value;
-    var descrp = this.descrp.value;
+    var name = this._name.value;
+    var descrp = this._descrp.value;
     if (this.state.dashToCreate.lists.length === 0) {
       alert("at leadt you must have a list in your dashboard");
     } else if (name.length === 0 || descrp.length === 0) {
@@ -72,9 +78,11 @@ class Dashboards extends Component<DashboardsProps, DashboardsState> {
       dash.description = descrp;
       this.setState({ dashToCreate: dash });
       console.log(this.state.dashToCreate);
-      // just test
+      // just test -use the name as id but later we will use mongo _id
       var dashs = this.state.dashboardsList;
-      dashs.push(dash);
+      dashs.dashboardsIds.push(dash.name);
+      Object.assign(dash, { id: dash.name });
+      dashs.dashboards[dash.name] = dash;
       this.setState({
         dashboardsList: dashs
       });
@@ -86,6 +94,8 @@ class Dashboards extends Component<DashboardsProps, DashboardsState> {
         },
         listAdder: ""
       });
+      this._name = "";
+      this._descrp = "";
       // proced API
     }
   };
@@ -190,7 +200,7 @@ class Dashboards extends Component<DashboardsProps, DashboardsState> {
                     helperText="Provide a name for you new dashboard"
                     name="name"
                     inputProps={{
-                      ref: (node: any) => (this.name = node)
+                      ref: (node: any) => (this._name = node)
                     }}
                   />
 
@@ -207,7 +217,7 @@ class Dashboards extends Component<DashboardsProps, DashboardsState> {
                     name="descrp"
                     rows="3"
                     inputProps={{
-                      ref: (node: any) => (this.descrp = node)
+                      ref: (node: any) => (this._descrp = node)
                     }}
                   />
                 </Box>
@@ -235,13 +245,16 @@ class Dashboards extends Component<DashboardsProps, DashboardsState> {
         </DialogActions>
       </Dialog>
     );
-    const dashboardsList = this.state.dashboardsList.map((dash: any) => {
-      return (
-        <div key={dash.key} className="dashboard-item">
-          {dash.name}
-        </div>
-      );
-    });
+    const dashboardsList = this.state.dashboardsList.dashboardsIds.map(
+      (dash: any) => {
+        const dashb = this.state.dashboardsList.dashboards[dash];
+        return (
+          <div key={dashb.id} className="dashboard-item">
+            {dashb.name}
+          </div>
+        );
+      }
+    );
     return (
       <Box
         direction="column"
