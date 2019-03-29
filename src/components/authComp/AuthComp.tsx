@@ -11,24 +11,42 @@ import {
   TextInput,
   ResponsiveContext
 } from "grommet";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import * as authActions from "../../actions/auth";
 export interface AuthCompProps {}
 
 export interface AuthCompState {
   step: number;
 }
 
-class AuthComp extends Component<AuthCompProps, AuthCompState> {
-  constructor(props: AuthCompProps) {
+class AuthComp extends Component<any, AuthCompState> {
+  constructor(props: any) {
     super(props);
-    this.state = { step: 1 };
+    this.state = {
+      step: 1
+    };
   }
   changeView = (view: number) => {
     return this.setState({ step: view });
   };
   signUp = (params: any) => {
-    console.log(params);
+    params.preventDefault();
+    console.log(params.value);
+    let password = params.value.password;
+    let password_confirmation = params.value.password_confirmation;
+    if (password.length < 6 || password != password_confirmation) {
+      alert("please provide correct password and make sure you repated again ");
+      return false;
+    } else {
+      console.log("fire register");
+      this.props.actions.signup({
+        name: params.value.name,
+        email: params.value.email,
+        password: params.value.password
+      });
+    }
   };
-
   render() {
     return (
       <ResponsiveContext.Consumer>
@@ -60,6 +78,29 @@ class AuthComp extends Component<AuthCompProps, AuthCompState> {
                       weight={400}>
                       uBoos / Sign up
                     </Text>
+                    {this.props.success && this.props.success.id === "SIGNUP" && (
+                      <Box
+                        fill="horizontal"
+                        pad="medium"
+                        round="xsmall"
+                        background="status-ok">
+                        <Text>
+                          Your account has been created , you can login now
+                        </Text>
+                      </Box>
+                    )}
+                    {this.props.error && this.props.error.id === "SIGNUP" && (
+                      <Box
+                        fill="horizontal"
+                        pad="medium"
+                        round="xsmall"
+                        background="status-error">
+                        <Text>
+                          {this.props.error.dettails.code} :{" "}
+                          {this.props.error.dettails.message}
+                        </Text>
+                      </Box>
+                    )}
                     <Form
                       messages={{
                         invalid: "Wrong value has been given",
@@ -192,4 +233,19 @@ class AuthComp extends Component<AuthCompProps, AuthCompState> {
   }
 }
 
-export default AuthComp;
+function mapDispatchToProps(dispatch: any) {
+  return {
+    actions: bindActionCreators(authActions, dispatch)
+  };
+}
+const mapStateToProps = (state: any) => {
+  return {
+    success: state.auth.success,
+    error: state.auth.error
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(AuthComp);
