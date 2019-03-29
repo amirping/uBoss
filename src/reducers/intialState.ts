@@ -11,6 +11,6 @@ export default {
     lists: []
   },
   view: { sideMenu: true },
-  auth: { connected: !!localStorage.getItem("token_jwt"), user: null },
+  auth: { connected: !!localStorage.getItem("token"), user: null },
   system: { success: null, error: null }
 };

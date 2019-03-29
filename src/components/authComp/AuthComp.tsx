@@ -47,6 +47,11 @@ class AuthComp extends Component<any, AuthCompState> {
       });
     }
   };
+  signIn = (params: any) => {
+    params.preventDefault();
+    console.log(params.value);
+    this.props.actions.login(params.value);
+  };
   render() {
     return (
       <ResponsiveContext.Consumer>
@@ -170,28 +175,39 @@ class AuthComp extends Component<any, AuthCompState> {
                       weight={400}>
                       uBoos / Sign in
                     </Text>
+                    {this.props.error && this.props.error.id === "LOGIN" && (
+                      <Box
+                        fill="horizontal"
+                        pad="medium"
+                        round="xsmall"
+                        background="status-error">
+                        <Text>
+                          {this.props.error.dettails.code} :{" "}
+                          {this.props.error.dettails.message}
+                        </Text>
+                      </Box>
+                    )}
                     <Form
+                      onSubmit={this.signIn}
                       messages={{
                         invalid: "it look like you miss something there",
                         required: "this field actually is required"
                       }}>
-                      <FormField name="email" label="Email" required>
-                        <TextInput
-                          type="email"
-                          size="small"
-                          placeholder="your email"
-                        />
-                      </FormField>
+                      <FormField
+                        name="email"
+                        label="Email"
+                        placeholder="your email"
+                        required
+                        {...{ type: "email" }}
+                      />
                       <FormField
                         typeof="password"
                         name="password"
                         label="Password"
-                        required>
-                        <TextInput
-                          type="password"
-                          placeholder="give a strong one"
-                        />
-                      </FormField>
+                        required
+                        placeholder="Your password"
+                        {...{ type: "password" }}
+                      />
 
                       <Box direction="row" justify="between">
                         <Box direction="row-responsive" gap="small">

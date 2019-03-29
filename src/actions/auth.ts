@@ -1,8 +1,12 @@
 import * as Types from "./actionTypes";
 import authApi from "../api/authApi";
 import { netError } from "./net";
-export function loginSuccess(payload: any) {
-  return { type: Types.LOGIN_SUCCESS, payload };
+
+export function loginSuccess() {
+  return { type: Types.LOGIN_SUCCESS };
+}
+export function loginError(error: any) {
+  return { type: Types.LOGIN_ERROR, error };
 }
 
 export function signupSuccess() {
@@ -13,7 +17,46 @@ export function signupError(error: any) {
 }
 
 export function login(payload: any) {
-  return { type: Types.LOGIN, payload };
+  console.log("fired action LOGIN");
+  return function(dispatch: any) {
+    return authApi
+      .login(payload)
+      .then(response => {
+        if (response.status === 200) {
+          let data = response.data;
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("refreshToken", data.refreshToken);
+          data.user["password"] = null;
+          localStorage.setItem("user", JSON.stringify(data.user));
+          dispatch(loginSuccess());
+        } else if (response.status === 401) {
+          dispatch(
+            loginError({
+              code: 401,
+              message: "Wrong email or password"
+            })
+          );
+        } else if (response.status === 422) {
+          dispatch(
+            loginError({
+              code: 422,
+              message: "JWT token invalid or did not provided"
+            })
+          );
+        } else {
+          dispatch(
+            loginError({
+              code: response.status,
+              message: "Problem with our servers"
+            })
+          );
+        }
+      })
+      .catch(error => {
+        dispatch(netError(error));
+        throw error;
+      });
+  };
 }
 
 export const signup = (user: any) => {
