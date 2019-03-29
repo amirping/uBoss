@@ -16,6 +16,7 @@ import {
 import { Form, Box, Text } from "grommet";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import "./UserProfile.css";
+import { connect } from "react-redux";
 export interface UserProfileProps {}
 
 export interface UserProfileState {
@@ -23,8 +24,8 @@ export interface UserProfileState {
   anchorEl: null;
 }
 
-class UserProfile extends Component<UserProfileProps, UserProfileState> {
-  constructor(props: UserProfileProps) {
+class UserProfile extends Component<any, UserProfileState> {
+  constructor(props: any) {
     super(props);
     this.state = { show: false, anchorEl: null };
   }
@@ -43,6 +44,9 @@ class UserProfile extends Component<UserProfileProps, UserProfileState> {
   openUserProfile = () => {
     this.setState({ show: true });
   };
+  componentDidMount() {
+    // call loadUser
+  }
   render() {
     const { anchorEl } = this.state;
     return (
@@ -185,5 +189,11 @@ class UserProfile extends Component<UserProfileProps, UserProfileState> {
     );
   }
 }
+const mapStateToProps = (state: any) => {};
 
-export default UserProfile;
+const mapDispatchToProps = {};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(UserProfile);
