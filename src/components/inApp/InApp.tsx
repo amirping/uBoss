@@ -36,7 +36,7 @@ class InApp extends Component<any, InAppState> {
 }
 const mapStateToProps = (state: any) => {
   return {
-    sideMenu: state.sideMenu
+    sideMenu: state.view.sideMenu
   };
 };
 

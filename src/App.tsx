@@ -32,16 +32,8 @@ export interface AppState {
 class App extends Component<any, AppState> {
   constructor(props: any) {
     super(props);
-    this.state = { connected: false };
+    console.log("connected :", this.props.connected);
   }
-  // componentDidMount() {
-  //   let token = localStorage.getItem("token");
-  //   if (token) {
-  //     this.setState({ connected: true });
-  //   } else {
-  //     this.setState({ connected: true }); // only for test -> true
-  //   }
-  // }
   render() {
     return (
       <Grommet theme={theme} full>
@@ -73,7 +65,7 @@ class App extends Component<any, AppState> {
 }
 const mapStateToProps = (state: any) => {
   return {
-    connected: state.connected
+    connected: state.auth.connected
   };
 };
 

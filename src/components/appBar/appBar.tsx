@@ -5,7 +5,7 @@ import MenuIcon from "@material-ui/icons/Menu";
 
 import UserProfile from "../userProfile/UserProfile";
 import { connect } from "react-redux";
-import { toggleSide } from "../../actions";
+import { toggleSide } from "../../actions/view";
 export interface AppBarProps {}
 
 export interface AppBarState {}
