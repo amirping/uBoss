@@ -69,10 +69,11 @@ class UserProfile extends Component<any, UserProfileState> {
       // all right let's make changes
       let updateObject = {
         _id: this.props.user._id,
-        name: this._userForm.name,
-        email: this._userForm.email
+        old_password: this._userForm.old_password,
+        new_password: this._userForm.new_password,
+        token: localStorage.getItem("token")
       };
-      //this.props.actions.updateUser()
+      this.props.actions.updatePassword(updateObject);
     }
   };
   handleClose = () => {

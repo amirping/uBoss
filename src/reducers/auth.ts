@@ -45,10 +45,11 @@ export default function auth(state = authState, action: any) {
   if (action.type === Types.UPDATE_USER_SUCCESS) {
     return Object.assign({}, state, {
       success: { id: "UPDATE_USER" },
+      error: null,
       user: JSON.parse(localStorage.getItem("user") || "null")
     });
   }
-  if (action.type === Types.UPDATE_USER_SUCCESS) {
+  if (action.type === Types.UPDATE_USER_ERROR) {
     return Object.assign({}, state, {
       success: null,
       error: { id: "UPDATE_USER", dettails: action.error },

@@ -82,9 +82,44 @@ export function updateUser(user: any) {
       });
   };
 }
+export function updatePassword(user: any) {
+  console.log("fire -> updatePassword");
+  return function(dispatch: any) {
+    return userApi
+      .updatePassword(user)
+      .then(response => {
+        if (response.status === 200) {
+          dispatch(updateUserSuccess());
+        } else if (response.status === 422) {
+          dispatch(
+            updateUserError({ code: 422, message: "Validation failed" })
+          );
+        } else if (response.status === 401) {
+          localStorage.clear();
+          dispatch(
+            updateUserError({
+              code: 403,
+              message: "JWT token invalid or did not provided"
+            })
+          );
+        } else {
+          dispatch(
+            updateUserError({
+              code: response.status,
+              message: "We have problems"
+            })
+          );
+        }
+      })
+      .catch(error => {
+        dispatch(netError(error));
+        throw error;
+      });
+  };
+}
 export function updateUserSuccess() {
   return { type: Types.UPDATE_USER_SUCCESS };
 }
 export function updateUserError(error: any) {
-  return { type: Types.UPDATE_USER_SUCCESS, error: error };
+  return { type: Types.UPDATE_USER_ERROR, error: error };
 }
