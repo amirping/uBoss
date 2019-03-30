@@ -20,7 +20,8 @@ export default function auth(state = authState, action: any) {
   if (action.type === Types.LOGIN_SUCCESS) {
     return Object.assign({}, state, {
       success: { id: "LOGIN" },
-      connected: !!localStorage.getItem("token")
+      connected: !!localStorage.getItem("token"),
+      user: JSON.parse(localStorage.getItem("user") || "null")
     });
   }
   if (action.type === Types.LOGIN_ERROR) {
@@ -31,7 +32,27 @@ export default function auth(state = authState, action: any) {
   }
   if (action.type === Types.LOAD_USER_SUCCESS) {
     return Object.assign({}, state, {
-      user: JSON.parse(localStorage.getItem("user") || "")
+      user: JSON.parse(localStorage.getItem("user") || "null")
+    });
+  }
+  if (action.type === Types.LOAD_USER_ERROR) {
+    return Object.assign({}, state, {
+      success: null,
+      error: { id: "LOAD_USER", dettails: action.error },
+      user: JSON.parse(localStorage.getItem("user") || "null")
+    });
+  }
+  if (action.type === Types.UPDATE_USER_SUCCESS) {
+    return Object.assign({}, state, {
+      success: { id: "UPDATE_USER" },
+      user: JSON.parse(localStorage.getItem("user") || "null")
+    });
+  }
+  if (action.type === Types.UPDATE_USER_SUCCESS) {
+    return Object.assign({}, state, {
+      success: null,
+      error: { id: "UPDATE_USER", dettails: action.error },
+      user: JSON.parse(localStorage.getItem("user") || "null")
     });
   }
 

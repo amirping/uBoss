@@ -10,7 +10,14 @@ export default {
     title: "",
     lists: []
   },
-  view: { sideMenu: true },
-  auth: { connected: !!localStorage.getItem("token"), user: null },
+  view: {
+    sideMenu: true,
+    profileManagement: false,
+    userProfile_anchorEl: null
+  },
+  auth: {
+    connected: !!localStorage.getItem("token"),
+    user: JSON.parse(localStorage.getItem("user") || "null")
+  },
   system: { success: null, error: null }
 };

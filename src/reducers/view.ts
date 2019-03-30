@@ -7,5 +7,15 @@ export default function auth(state = initialState.view, action: any) {
       sideMenu: !state.sideMenu
     });
   }
+  if (action.type === Types.PROFILE_MANAGEMENT_OPEN) {
+    return Object.assign({}, state, {
+      profileManagement: true
+    });
+  }
+  if (action.type === Types.PROFILE_MANAGEMENT_CLOSE) {
+    return Object.assign({}, state, {
+      profileManagement: false
+    });
+  }
   return state;
 }

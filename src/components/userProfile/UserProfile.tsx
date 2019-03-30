@@ -17,36 +17,76 @@ import { Form, Box, Text } from "grommet";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import "./UserProfile.css";
 import { connect } from "react-redux";
+import {
+  openProfileManagement,
+  closeProfileManagement
+} from "../../actions/view";
+import * as userActions from "../../actions/user";
+import { bindActionCreators } from "redux";
 export interface UserProfileProps {}
 
 export interface UserProfileState {
-  show: boolean;
   anchorEl: null;
 }
 
 class UserProfile extends Component<any, UserProfileState> {
+  _userForm: any = {
+    name: this.props.user.name,
+    email: this.props.user.email,
+    old_password: "",
+    new_password: "",
+    new_password_confirmation: ""
+  };
   constructor(props: any) {
     super(props);
-    this.state = { show: false, anchorEl: null };
+    this.state = { anchorEl: null };
   }
-  handleCloseUserProfile = () => {
-    this.setState({
-      show: false
-    });
-  };
   handleClick = (event: any) => {
     this.setState({ anchorEl: event.currentTarget });
   };
-
+  updateUserIfno = (event: any) => {
+    event.preventDefault();
+    // go ahead for action etc
+    let updateObject = {
+      _id: this.props.user._id,
+      name: this._userForm.name,
+      email: this._userForm.email,
+      token: localStorage.getItem("token")
+    };
+    this.props.actions.updateUser(updateObject);
+  };
+  updateUserSecurity = (event: any) => {
+    event.preventDefault();
+    if (this._userForm.old_password === this._userForm.new_password) {
+      alert("you cannot use the old password as new one");
+      return false;
+    } else if (
+      this._userForm.new_password != this._userForm.new_password_confirmation
+    ) {
+      alert("please make sure that you confirm the new password");
+      return false;
+    } else {
+      // all right let's make changes
+      let updateObject = {
+        _id: this.props.user._id,
+        name: this._userForm.name,
+        email: this._userForm.email
+      };
+      //this.props.actions.updateUser()
+    }
+  };
   handleClose = () => {
-    this.setState({ anchorEl: null });
+    this.props.closeProfileManagement();
   };
   openUserProfile = () => {
-    this.setState({ show: true });
+    let user = JSON.parse(localStorage.getItem("user") || "");
+    this.props.actions.loadUser(user);
+    this.props.openProfileManagement();
   };
-  componentDidMount() {
-    // call loadUser
-  }
+  _handleFormFieldChange = (event: any) => {
+    this._userForm[event.target.name] = event.target.value;
+    console.log(this._userForm);
+  };
   render() {
     const { anchorEl } = this.state;
     return (
@@ -70,7 +110,7 @@ class UserProfile extends Component<any, UserProfileState> {
           fullScreen={true}
           maxWidth="lg"
           scroll="paper"
-          open={this.state.show}
+          open={this.props.profileManagement}
           onClose={this.handleClose}
           aria-labelledby="max-width-dialog-title">
           <DialogTitle id="max-width-dialog-title">
@@ -91,19 +131,41 @@ class UserProfile extends Component<any, UserProfileState> {
                 size="xlarge"
                 alignSelf="center"
                 margin={{ horizontal: "small" }}>
-                Folen ben Folen
+                {this.props.user.name}
               </Text>
             </Box>
+
             <Divider />
+            {this.props.success && this.props.success.id === "UPDATE_USER" && (
+              <Box
+                fill="horizontal"
+                pad="medium"
+                round="xsmall"
+                background="status-ok">
+                <Text>Your account has been Updates</Text>
+              </Box>
+            )}
+            {this.props.error && this.props.error.id === "UPDATE_USER" && (
+              <Box
+                fill="horizontal"
+                pad="medium"
+                round="xsmall"
+                background="status-error">
+                <Text>
+                  {this.props.error.dettails.code} :{" "}
+                  {this.props.error.dettails.message}
+                </Text>
+              </Box>
+            )}
             <Box direction="column" fill>
               <Box direction="row-responsive" fill justify="between" gap="30px">
                 <Box direction="column" flex>
-                  <Form>
+                  <Form onSubmit={this.updateUserIfno}>
                     <Box direction="column" flex>
                       <TextField
                         id="name"
                         label="Name"
-                        defaultValue=""
+                        defaultValue={this.props.user.name}
                         margin="normal"
                         variant="outlined"
                         required
@@ -111,11 +173,12 @@ class UserProfile extends Component<any, UserProfileState> {
                         autoFocus={true}
                         helperText="change your name !"
                         name="name"
+                        onChange={this._handleFormFieldChange}
                       />
                       <TextField
                         id="email"
                         label="Email"
-                        defaultValue=""
+                        defaultValue={this.props.user.email}
                         margin="normal"
                         variant="outlined"
                         required
@@ -123,6 +186,7 @@ class UserProfile extends Component<any, UserProfileState> {
                         helperText="change your email"
                         name="email"
                         type="email"
+                        onChange={this._handleFormFieldChange}
                       />
                       <Button variant="outlined" color="primary" type="submit">
                         Save Changes
@@ -132,7 +196,7 @@ class UserProfile extends Component<any, UserProfileState> {
                 </Box>
 
                 <Box direction="column" flex>
-                  <Form>
+                  <Form onSubmit={this.updateUserSecurity}>
                     <Box direction="column" flex>
                       <TextField
                         id="old_password"
@@ -145,6 +209,7 @@ class UserProfile extends Component<any, UserProfileState> {
                         helperText="Provide your old password"
                         name="old_password"
                         type="password"
+                        onChange={this._handleFormFieldChange}
                       />
                       <TextField
                         id="new_password"
@@ -157,9 +222,10 @@ class UserProfile extends Component<any, UserProfileState> {
                         helperText="Provide your new password"
                         name="new_password"
                         type="password"
+                        onChange={this._handleFormFieldChange}
                       />
                       <TextField
-                        id="new_password_c"
+                        id="new_password_confirmation"
                         label="new password again"
                         defaultValue=""
                         margin="normal"
@@ -167,8 +233,9 @@ class UserProfile extends Component<any, UserProfileState> {
                         required
                         placeholder="your new password again"
                         helperText="Provide your new password again"
-                        name="new_password"
+                        name="new_password_confirmation"
                         type="password"
+                        onChange={this._handleFormFieldChange}
                       />
                       <Button variant="outlined" color="primary" type="submit">
                         Change password
@@ -180,7 +247,7 @@ class UserProfile extends Component<any, UserProfileState> {
             </Box>
           </DialogContent>
           <DialogActions>
-            <Button onClick={this.handleCloseUserProfile} color="primary">
+            <Button onClick={this.handleClose} color="primary">
               Close
             </Button>
           </DialogActions>
@@ -189,9 +256,22 @@ class UserProfile extends Component<any, UserProfileState> {
     );
   }
 }
-const mapStateToProps = (state: any) => {};
+const mapStateToProps = (state: any) => {
+  return {
+    profileManagement: state.view.profileManagement,
+    user: state.auth.user,
+    success: state.auth.success,
+    error: state.auth.error
+  };
+};
 
-const mapDispatchToProps = {};
+const mapDispatchToProps = (dispatch: any) => {
+  return {
+    openProfileManagement: () => dispatch(openProfileManagement()),
+    closeProfileManagement: () => dispatch(closeProfileManagement()),
+    actions: bindActionCreators(userActions, dispatch)
+  };
+};
 
 export default connect(
   mapStateToProps,

@@ -21,11 +21,19 @@ export default class AuthApi {
       });
   }
   static updateUser(user: any) {
-    console.log("Fire API -> signup");
-    const request = new Request(this.API_URL + "register", {
-      method: "POST",
-      headers: this.API_Header,
-      body: JSON.stringify(user)
+    console.log("Fire API -> updateUser");
+    let newObej = {
+      name: user.name,
+      email: user.email
+    };
+    const request = new Request(this.API_URL + user._id, {
+      method: "PUT",
+      headers: new Headers({
+        "Content-Type": "application/json",
+        AUTHORIZATION: `Bearer ${user.token}`
+      }),
+
+      body: JSON.stringify(newObej)
     });
     return fetch(request)
       .then(response => {
