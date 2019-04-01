@@ -77,6 +77,7 @@ class UserProfile extends Component<any, UserProfileState> {
     }
   };
   handleClose = () => {
+    this.setState({ anchorEl: null }); // move it to closeProfileManagement #7 bug
     this.props.closeProfileManagement();
   };
   openUserProfile = () => {
