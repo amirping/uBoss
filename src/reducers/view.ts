@@ -17,5 +17,15 @@ export default function auth(state = initialState.view, action: any) {
       profileManagement: false
     });
   }
+  if (action.type === Types.DASHBOARD_CREATOR_CLOSE) {
+    return Object.assign({}, state, {
+      dashboardCreator: false
+    });
+  }
+  if (action.type === Types.DASHBOARD_CREATOR_OPEN) {
+    return Object.assign({}, state, {
+      dashboardCreator: true
+    });
+  }
   return state;
 }

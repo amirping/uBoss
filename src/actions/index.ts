@@ -23,9 +23,9 @@ export function logoutSuccess(payload: any) {
 export function selectDashboard(payload: any) {
   return { type: Types.SELECT_DASHBOARD, payload };
 }
-export function importDashboard(payload: any) {
-  return { type: Types.IMPORT_DASHBOARD, payload };
-}
+// export function importDashboard(payload: any) {
+//   return { type: Types.IMPORT_DASHBOARD, payload };
+// }
 export function importList(payload: any) {
   return { type: Types.IMPORT_LIST, payload };
 }

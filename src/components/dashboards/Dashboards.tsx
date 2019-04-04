@@ -4,6 +4,7 @@ import "./Dashboards.css";
 import Fab from "@material-ui/core/Fab";
 import AddIcon from "@material-ui/icons/Add";
 import DeleteIcon from "@material-ui/icons/Delete";
+import * as dashboardsActions from "../../actions/dashboards";
 import {
   Dialog,
   DialogTitle,
@@ -21,6 +22,12 @@ import {
   ListItemText,
   ListItemSecondaryAction
 } from "@material-ui/core";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import {
+  openDashboardCreator,
+  closeDashboardCreator
+} from "../../actions/view";
 
 export interface DashboardsProps {}
 
@@ -38,10 +45,10 @@ export interface DashboardsState {
   listAdder: string;
 }
 
-class Dashboards extends Component<DashboardsProps, DashboardsState> {
+class Dashboards extends Component<any, DashboardsState> {
   _name: any;
   _descrp: any;
-  constructor(props: DashboardsProps) {
+  constructor(props: any) {
     super(props);
     this.state = {
       dashboardsList: {
@@ -58,10 +65,15 @@ class Dashboards extends Component<DashboardsProps, DashboardsState> {
     };
   }
   handleClose = () => {
-    this.setState({ open_creator: false });
+    this.props.closeCreator();
   };
+  componentDidMount() {
+    let token = localStorage.getItem("token");
+    this.props.actions.loadDashboards(token);
+  }
+
   handleOpen = () => {
-    this.setState({ open_creator: true });
+    this.props.openCreator();
   };
   handleCreate = (params: any) => {
     console.log(params);
@@ -178,7 +190,7 @@ class Dashboards extends Component<DashboardsProps, DashboardsState> {
         fullWidth={true}
         maxWidth="lg"
         scroll="paper"
-        open={this.state.open_creator}
+        open={this.props.dashboardCreator}
         onClose={this.handleClose}
         aria-labelledby="max-width-dialog-title">
         <DialogTitle id="max-width-dialog-title">Create Dashboard</DialogTitle>
@@ -283,5 +295,24 @@ class Dashboards extends Component<DashboardsProps, DashboardsState> {
     );
   }
 }
+const mapStateToProps = (state: any) => {
+  console.log(state);
+  return {
+    dashboardCreator: state.view.dashboardCreator,
+    dashboardsIds: state.dashboardsIDs,
+    dashboards: state.dashboards
+  };
+};
 
-export default Dashboards;
+const mapDispatchToProps = (dispatch: any) => {
+  return {
+    openCreator: () => dispatch(openDashboardCreator()),
+    closeCreator: () => dispatch(closeDashboardCreator()),
+    actions: bindActionCreators(dashboardsActions, dispatch)
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Dashboards);

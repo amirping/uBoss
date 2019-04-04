@@ -6,14 +6,15 @@ export default {
   selectedDashboardID: null,
   selectedDashboardData: null,
   dashboardTocreate: {
-    id: "",
     title: "",
-    lists: []
+    description: "",
+    lists: {}
   },
   view: {
     sideMenu: true,
     profileManagement: false,
-    userProfile_anchorEl: null
+    userProfile_anchorEl: null,
+    dashboardCreator: false
   },
   auth: {
     connected: !!localStorage.getItem("token"),
