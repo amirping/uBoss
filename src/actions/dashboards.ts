@@ -59,6 +59,33 @@ export function loadDashboards(token: string) {
       });
   };
 }
+export function addListToDashboardCreator(data: any) {
+  return { type: Types.DASHBOARD_CREATOR_ADD_LIST, payload: data };
+}
+export function createDashboard(dashboard: any, token: string) {
+  console.log("Fire action -> createDashboard");
+  return function(dispatch: any) {
+    return dashboardApi
+      .createDashboard(dashboard, token)
+      .then(response => {
+        if (response.status === 201) {
+          let ndash = response.data;
+          dispatch(createDashboardSuccess(ndash));
+        } else {
+          dispatch(
+            createDashboardError({
+              code: response.status,
+              message: "We have problems"
+            })
+          );
+        }
+      })
+      .catch(error => {
+        dispatch(netError(error));
+        throw error;
+      });
+  };
+}
 export function loadDashboardSuccess(data: any) {
   return { type: Types.LOAD_DASHBOARD_SUCCESS, payload: data };
 }
@@ -120,4 +147,10 @@ export function updateDashboardSuccess() {
 }
 export function updateDashboardError(error: any) {
   return { type: Types.UPDATE_DASHBOARD_ERROR, error: error };
+}
+export function createDashboardSuccess(dashboard: any) {
+  return { type: Types.CREATE_DASHBOARD_SUCCESS, payload: dashboard };
+}
+export function createDashboardError(error: any) {
+  return { type: Types.CREATE_DASHBOARD_ERROR, error: error };
 }

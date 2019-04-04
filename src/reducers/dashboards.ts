@@ -1,6 +1,7 @@
 // still off
 import * as Types from "../actions/actionTypes";
 import intialState from "./intialState";
+import { ListSubheader } from "@material-ui/core";
 let dashboardsState = {};
 Object.assign(
   dashboardsState,
@@ -9,7 +10,7 @@ Object.assign(
   intialState.dashboardTocreate,
   intialState.dashboardsList
 );
-export default function dashboards(state = dashboardsState, action: any) {
+export default function dashboards(state: any = dashboardsState, action: any) {
   if (action.type === Types.LOAD_DASHBOARDS_SUCCESS) {
     console.log("fiirrreee");
 
@@ -19,8 +20,6 @@ export default function dashboards(state = dashboardsState, action: any) {
       dashboardsIDS.push(dash._id);
       dashslist[dash._id] = dash;
     });
-    console.log(dashboardsIDS);
-    console.log(dashslist);
 
     return Object.assign({}, state, {
       //   success: { id: "SIGNUP" }
@@ -32,6 +31,24 @@ export default function dashboards(state = dashboardsState, action: any) {
     return Object.assign({}, state, {
       success: null,
       error: { id: "DASHBOARDS", dettails: action.error }
+    });
+  }
+  if (action.type === Types.DASHBOARD_CREATOR_ADD_LIST) {
+    //let arr = state.lists;
+    return Object.assign({}, state, {
+      lists: state.lists.concat(action.payload)
+    });
+  }
+  if (action.type === Types.CREATE_DASHBOARD_SUCCESS) {
+    //let arr = state.lists;
+    let dashs = state.dashboards;
+    dashs[action.payload._id] = action.payload;
+    return Object.assign({}, state, {
+      lists: [],
+      error: null,
+      dashboardsIDs: state.dashboardsIDs.concat(action.payload._id),
+      dashboards: dashs,
+      success: { id: "DASHBOARD_CREATED" }
     });
   }
   return state;

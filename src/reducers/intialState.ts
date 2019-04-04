@@ -6,9 +6,9 @@ export default {
   selectedDashboardID: null,
   selectedDashboardData: null,
   dashboardTocreate: {
-    title: "",
-    description: "",
-    lists: {}
+    // title: "",
+    // description: "",
+    lists: []
   },
   view: {
     sideMenu: true,

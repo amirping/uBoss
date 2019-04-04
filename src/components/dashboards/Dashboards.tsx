@@ -48,6 +48,8 @@ export interface DashboardsState {
 class Dashboards extends Component<any, DashboardsState> {
   _name: any;
   _descrp: any;
+  _listAdder: any;
+  _token: any;
   constructor(props: any) {
     super(props);
     this.state = {
@@ -68,8 +70,8 @@ class Dashboards extends Component<any, DashboardsState> {
     this.props.closeCreator();
   };
   componentDidMount() {
-    let token = localStorage.getItem("token");
-    this.props.actions.loadDashboards(token);
+    this._token = localStorage.getItem("token");
+    this.props.actions.loadDashboards(this._token);
   }
 
   handleOpen = () => {
@@ -80,61 +82,73 @@ class Dashboards extends Component<any, DashboardsState> {
     // check if we have at least a list then create
     var name = this._name.value;
     var descrp = this._descrp.value;
-    if (this.state.dashToCreate.lists.length === 0) {
-      alert("at leadt you must have a list in your dashboard");
+    if (this.props.dashboardToCreate.lists.length === 0) {
+      alert("at least you must have a list in your dashboard");
     } else if (name.length === 0 || descrp.length === 0) {
       alert("name and description are required to create a dashboard");
     } else {
-      var dash = this.state.dashToCreate;
-      dash.name = name;
-      dash.description = descrp;
-      this.setState({ dashToCreate: dash });
-      console.log(this.state.dashToCreate);
-      // just test -use the name as id but later we will use mongo _id
-      var dashs = this.state.dashboardsList;
-      dashs.dashboardsIds.push(dash.name);
-      Object.assign(dash, { id: dash.name });
-      dashs.dashboards[dash.name] = dash;
-      this.setState({
-        dashboardsList: dashs
-      });
-      this.setState({
-        dashToCreate: {
-          name: "",
-          description: "",
-          lists: []
-        },
-        listAdder: ""
-      });
-      this._name = "";
-      this._descrp = "";
+      let dash = {
+        title: name,
+        description: descrp,
+        lists: this.props.dashboardToCreate.lists
+      };
+      this.props.actions.createDashboard(dash, this._token);
+      // var dash = this.state.dashToCreate;
+      // dash.name = name;
+      // dash.description = descrp;
+      // this.setState({ dashToCreate: dash });
+      // console.log(this.state.dashToCreate);
+      // // just test -use the name as id but later we will use mongo _id
+      // var dashs = this.state.dashboardsList;
+      // dashs.dashboardsIds.push(dash.name);
+      // Object.assign(dash, { id: dash.name });
+      // dashs.dashboards[dash.name] = dash;
+      // this.setState({
+      //   dashboardsList: dashs
+      // });
+      // this.setState({
+      //   dashToCreate: {
+      //     name: "",
+      //     description: "",
+      //     lists: []
+      //   },
+      //   listAdder: ""
+      // });
+      // this._name = "";
+      // this._descrp = "";
       // proced API
     }
   };
   handleAddList = () => {
-    if (this.state.listAdder.length === 0) {
+    let listVal = this._listAdder.value;
+    if (listVal.length === 0) {
       alert("you need to name it");
       return false;
     }
-    var listIs = {
-      key: this.state.listAdder,
-      title: this.state.listAdder
-    };
-    var allk = this.state.dashToCreate.lists.filter((obj: any) => {
-      return obj.title === this.state.listAdder;
-    });
-    if (allk.length != 0) {
-      console.log("already exist");
+    if (this.props.dashboardToCreate.lists.includes(listVal)) {
+      alert("the list name must be unique");
     } else {
-      var newValues = this.state.dashToCreate;
-      newValues.lists.push(listIs);
-      console.log(newValues);
-      this.setState({
-        // add list to lists
-        dashToCreate: newValues,
-        listAdder: ""
-      });
+      this.props.actions.addListToDashboardCreator(listVal);
     }
+    // var listIs = {
+    //   key: listVal,
+    //   title: listVal
+    // };
+    // var allk = this.state.dashToCreate.lists.filter((obj: any) => {
+    //   return obj.title === this.state.listAdder;
+    // });
+    // if (allk.length != 0) {
+    //   console.log("already exist");
+    // } else {
+    //   var newValues = this.state.dashToCreate;
+    //   newValues.lists.push(listIs);
+    //   console.log(newValues);
+    //   this.setState({
+    //     // add list to lists
+    //     dashToCreate: newValues,
+    //     listAdder: ""
+    //   });
+    // }
   };
   updateListAdder = (params: any) => {
     this.setState({
@@ -156,8 +170,11 @@ class Dashboards extends Component<any, DashboardsState> {
           placeholder="A lidt name to be created"
           name="list_name"
           id="list_name"
-          value={this.state.listAdder}
-          onChange={this.updateListAdder}
+          // value={this.props.dashboardToCreate.listAdder}
+          // onChange={this.updateListAdder}
+          inputProps={{
+            ref: (node: any) => (this._listAdder = node)
+          }}
         />
         <IconButton
           className="add-f-iconButton"
@@ -170,11 +187,11 @@ class Dashboards extends Component<any, DashboardsState> {
   };
   createItems = (params: any) => {
     return (
-      <ListItem key={params.key}>
+      <ListItem key={params}>
         <ListItemAvatar>
-          <Avatar>{params.title}</Avatar>
+          <Avatar>{params}</Avatar>
         </ListItemAvatar>
-        <ListItemText primary={params.title} />
+        <ListItemText primary={params} />
         <ListItemSecondaryAction>
           <IconButton aria-label="Delete">
             <DeleteIcon />
@@ -183,8 +200,15 @@ class Dashboards extends Component<any, DashboardsState> {
       </ListItem>
     );
   };
+  getShortName = (longName: string) => {
+    let name = "";
+    longName.split(/[\s,-]+/).map(st => {
+      name += st[0].toUpperCase();
+    });
+    return name;
+  };
   render() {
-    var listItems = this.state.dashToCreate.lists.map(this.createItems);
+    var listItems = this.props.dashboardToCreate.lists.map(this.createItems);
     const createDialog = (
       <Dialog
         fullWidth={true}
@@ -257,16 +281,14 @@ class Dashboards extends Component<any, DashboardsState> {
         </DialogActions>
       </Dialog>
     );
-    const dashboardsList = this.state.dashboardsList.dashboardsIds.map(
-      (dash: any) => {
-        const dashb = this.state.dashboardsList.dashboards[dash];
-        return (
-          <div key={dashb.id} className="dashboard-item">
-            {dashb.name}
-          </div>
-        );
-      }
-    );
+    const dashboardsList = this.props.dashboardsIds.map((dash: any) => {
+      const dashb = this.props.dashboards[dash];
+      return (
+        <div key={dashb._id} className="dashboard-item">
+          {this.getShortName(dashb.title)}
+        </div>
+      );
+    });
     return (
       <Box
         direction="column"
@@ -299,8 +321,13 @@ const mapStateToProps = (state: any) => {
   console.log(state);
   return {
     dashboardCreator: state.view.dashboardCreator,
-    dashboardsIds: state.dashboardsIDs,
-    dashboards: state.dashboards
+    dashboardsIds: state.dashboards.dashboardsIDs,
+    dashboards: state.dashboards.dashboards,
+    dashboardToCreate: {
+      title: state.dashboards.title,
+      description: state.dashboards.description,
+      lists: state.dashboards.lists
+    }
   };
 };
 

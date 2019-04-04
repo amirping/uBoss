@@ -1,4 +1,5 @@
 // import axios from "axios";
+import uuidv1 from "uuid";
 export default class AuthApi {
   static API_URL = "http://127.0.0.1:3333/api/dashboards/";
   static API_Header = new Headers({ "Content-Type": "application/json" });
@@ -60,13 +61,23 @@ export default class AuthApi {
         return error;
       });
   }
-  static createDashboard(dashboard: any, user: any) {
+  static createDashboard(dashboard: any, token: any) {
     console.log("Fire API -> createDashboard");
+    // normelize dashboard to meet the backend struct
+    let lists: any = {};
+    dashboard.lists.map((li: string) => {
+      const code = uuidv1(); // generate unique code
+      lists[code] = {
+        id: code,
+        name: li
+      };
+    });
+    dashboard.lists = lists;
     const request = new Request(this.API_URL, {
       method: "POST",
       headers: new Headers({
         "Content-Type": "application/json",
-        AUTHORIZATION: `Bearer ${user.token}`
+        AUTHORIZATION: `Bearer ${token}`
       }),
 
       body: JSON.stringify(dashboard)

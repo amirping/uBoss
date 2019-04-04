@@ -2,6 +2,7 @@ import { combineReducers } from "redux";
 import view from "./view";
 import net from "./net";
 import auth from "./auth";
+import dashboards from "./dashboards";
 // const initialState = {
 //   dashboardsList: {
 //     dashboardsIDs: [],
@@ -25,6 +26,7 @@ const rootReducer = combineReducers({
   // short hand property names
   view,
   net,
-  auth
+  auth,
+  dashboards
 });
 export default rootReducer;
