@@ -231,7 +231,12 @@ class Dashboards extends Component<any, DashboardsState> {
       return (
         <div
           key={dashb._id}
-          className="dashboard-item"
+          className={
+            "dashboard-item " +
+            (this.props.selected_dashboard === dashb._id
+              ? "dashboard-item-selected"
+              : "")
+          }
           onClick={this.handledashboardSelect(dashb._id)}>
           {this.getShortName(dashb.title)}
         </div>
