@@ -19,22 +19,6 @@ export interface DashboardState {
 class Dashboard extends Component<any, DashboardState> {
   constructor(props: any) {
     super(props);
-    this.state = {
-      data: {
-        name: "Alpha Main Dashboard",
-        descrip:
-          "lorem ispiskjd nfksdkf nkjsdn fsdhjf gjqdsjfbjdsqfjbsqdjfb jhsqdf jbsd jfbsqjdfbjqsdfj bsqdjfbjds fjsdfjbsqdjf bjqdsbf jqsdf jbsdqjf bjsqdbf jsqdf jbsqdjfbjqsdbf jqdsf jbqsdjfbsd ",
-        lists: [
-          { key: "done", title: "done" },
-          { key: "progress", title: "progress" },
-          { key: "progressss", title: "progressss" }
-          // { key: "donesd", title: "donesd" },
-          // { key: "done", title: "done" },
-          // { key: "done", title: "done" },
-          // { key: "done", title: "done" }
-        ]
-      }
-    };
   }
   listRender = () => {
     return (
@@ -74,11 +58,11 @@ class Dashboard extends Component<any, DashboardState> {
           pad="small"
           gap="20px"
           fill>
-          {/* {this.state.data.lists.map((list: any) => (
-            <ListItem key={list.key} />
-          ))} */}
           {Object.keys(this.props.dashboard_data.lists).map((listID: any) => (
-            <ListItem key={listID} />
+            <ListItem
+              key={listID}
+              listData={this.props.dashboard_data.lists[listID]}
+            />
           ))}
         </Box>
       </Box>

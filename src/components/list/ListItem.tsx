@@ -10,8 +10,8 @@ export interface ListItemState {
   data: any;
 }
 
-class ListItem extends Component<ListItemProps, ListItemState> {
-  constructor(props: ListItemProps) {
+class ListItem extends Component<any, ListItemState> {
+  constructor(props: any) {
     super(props);
     this.state = {
       data: {
@@ -78,7 +78,7 @@ class ListItem extends Component<ListItemProps, ListItemState> {
         background="dark-3">
         <Box direction="row" justify="between" pad={{ left: "small" }}>
           <Text margin={{ top: "small" }} size="medium">
-            {this.state.data.list.title}
+            {this.props.listData.name}
           </Text>
           <IconButton>
             <MoreVert color="action" fontSize="small" />
