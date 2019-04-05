@@ -52,7 +52,6 @@ class Dashboard extends Component<any, DashboardState> {
     );
   };
   DashRender = () => {
-    //const lists = this.state.data.lists.map(<ListItem />);
     return (
       <Box direction="column" fill>
         <Box
@@ -75,8 +74,11 @@ class Dashboard extends Component<any, DashboardState> {
           pad="small"
           gap="20px"
           fill>
-          {this.state.data.lists.map((list: any) => (
+          {/* {this.state.data.lists.map((list: any) => (
             <ListItem key={list.key} />
+          ))} */}
+          {Object.keys(this.props.dashboard_data.lists).map((listID: any) => (
+            <ListItem key={listID} />
           ))}
         </Box>
       </Box>
