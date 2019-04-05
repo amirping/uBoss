@@ -222,11 +222,17 @@ class Dashboards extends Component<any, DashboardsState> {
   handleSnackClose = () => {
     this._openSnack = false;
   };
+  handledashboardSelect = (dashboardID: string) => (event: any) => {
+    this.props.actions.selectDashboard(dashboardID, this._token);
+  };
   DashsRender = () => {
     const dashboardsList = this.props.dashboardsIds.map((dash: any) => {
       const dashb = this.props.dashboards[dash];
       return (
-        <div key={dashb._id} className="dashboard-item">
+        <div
+          key={dashb._id}
+          className="dashboard-item"
+          onClick={this.handledashboardSelect(dashb._id)}>
           {this.getShortName(dashb.title)}
         </div>
       );
@@ -389,7 +395,8 @@ const mapStateToProps = (state: any) => {
       lists: state.dashboards.lists
     },
     success: state.dashboards.success,
-    error: state.dashboards.error
+    error: state.dashboards.error,
+    selected_dashboard: state.dashboards.selectedDashboardID
   };
 };
 

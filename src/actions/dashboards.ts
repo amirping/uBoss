@@ -2,11 +2,11 @@ import * as Types from "./actionTypes";
 import dashboardApi from "../api/dashboardApi";
 import { netError } from "./net";
 import { closeDashboardCreator } from "./view";
-export function loadDashboard(dashboard: any, user: any) {
+export function loadDashboard(dashboardID: any, token: any) {
   console.log("Fire action -> loadDashboard");
   return function(dispatch: any) {
     return dashboardApi
-      .getDashboard(user, dashboard._id)
+      .getDashboard(token, dashboardID)
       .then(response => {
         if (response.status === 200) {
           let ndash = response.data;
@@ -59,6 +59,10 @@ export function loadDashboards(token: string) {
       });
   };
 }
+/**
+ *
+ * @param data the list name to add
+ */
 export function addListToDashboardCreator(data: any) {
   return { type: Types.DASHBOARD_CREATOR_ADD_LIST, payload: data };
 }
@@ -148,12 +152,30 @@ export function updateDashboard(dashboard: any, user: any) {
 export function updateDashboardSuccess() {
   return { type: Types.UPDATE_DASHBOARD_SUCCESS };
 }
+/**
+ * @param error
+ */
 export function updateDashboardError(error: any) {
   return { type: Types.UPDATE_DASHBOARD_ERROR, error: error };
 }
+/**
+ * @param dashboard
+ */
 export function createDashboardSuccess(dashboard: any) {
   return { type: Types.CREATE_DASHBOARD_SUCCESS, payload: dashboard };
 }
+/**
+ *
+ */
 export function createDashboardError(error: any) {
   return { type: Types.CREATE_DASHBOARD_ERROR, error: error };
+}
+/**
+ * @param dashboardID the dashboard id to select
+ */
+export function selectDashboard(dashboardID: string, token: string) {
+  return function(dispatch: any) {
+    dispatch({ type: Types.SELECT_DASHBOARD, payload: dashboardID });
+    dispatch(loadDashboard(dashboardID, token));
+  };
 }

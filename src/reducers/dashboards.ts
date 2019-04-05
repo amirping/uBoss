@@ -1,30 +1,39 @@
-// still off
 import * as Types from "../actions/actionTypes";
 import intialState from "./intialState";
-import { ListSubheader } from "@material-ui/core";
 let dashboardsState = {};
 Object.assign(
   dashboardsState,
   intialState.auth,
   intialState.system,
   intialState.dashboardTocreate,
-  intialState.dashboardsList
+  intialState.dashboardsList,
+  intialState.loadedDashboard
 );
 export default function dashboards(state: any = dashboardsState, action: any) {
   if (action.type === Types.LOAD_DASHBOARDS_SUCCESS) {
     console.log("fiirrreee");
-
     let dashboardsIDS: any = [];
     let dashslist: any = {};
     action.payload.map((dash: any) => {
       dashboardsIDS.push(dash._id);
       dashslist[dash._id] = dash;
     });
-
     return Object.assign({}, state, {
-      //   success: { id: "SIGNUP" }
       dashboardsIDs: dashboardsIDS,
       dashboards: dashslist
+    });
+  }
+  if (action.type === Types.LOAD_DASHBOARD_SUCCESS) {
+    console.log("fiirrreee one");
+    return Object.assign({}, state, {
+      selectedDashboardData: action.payload
+    });
+  }
+  if (action.type === Types.LOAD_DASHBOARD_ERROR) {
+    console.log("fiirrreee one");
+    return Object.assign({}, state, {
+      success: null,
+      error: { id: "DASHBOARD", dettails: action.error }
     });
   }
   if (action.type === Types.LOAD_DASHBOARDS_ERROR) {
@@ -57,6 +66,13 @@ export default function dashboards(state: any = dashboardsState, action: any) {
         id: "DASHBOARDS",
         message: "Your Dashboard Have been created"
       }
+    });
+  }
+  if (action.type === Types.SELECT_DASHBOARD) {
+    console.log("select", action.payload);
+    return Object.assign({}, state, {
+      selectedDashboardID: action.payload,
+      selectedDashboardData: null
     });
   }
   return state;
