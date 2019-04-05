@@ -20,8 +20,12 @@ import {
   ListItemAvatar,
   Avatar,
   ListItemText,
-  ListItemSecondaryAction
+  ListItemSecondaryAction,
+  Snackbar,
+  CircularProgress
 } from "@material-ui/core";
+import CheckCircleIcon from "@material-ui/icons/CheckCircle";
+import ErrorIcon from "@material-ui/icons/Error";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import {
@@ -32,17 +36,17 @@ import {
 export interface DashboardsProps {}
 
 export interface DashboardsState {
-  dashboardsList: {
-    dashboardsIds: Array<string>;
-    dashboards: any;
-  };
-  open_creator: boolean;
-  dashToCreate: {
-    name: "";
-    description: "";
-    lists: Array<{}>;
-  };
-  listAdder: string;
+  // dashboardsList: {
+  //   dashboardsIds: Array<string>;
+  //   dashboards: any;
+  // };
+  // open_creator: boolean;
+  // dashToCreate: {
+  //   name: "";
+  //   description: "";
+  //   lists: Array<{}>;
+  // };
+  // listAdder: string;
 }
 
 class Dashboards extends Component<any, DashboardsState> {
@@ -50,21 +54,22 @@ class Dashboards extends Component<any, DashboardsState> {
   _descrp: any;
   _listAdder: any;
   _token: any;
+  _openSnack: boolean = true;
   constructor(props: any) {
     super(props);
-    this.state = {
-      dashboardsList: {
-        dashboardsIds: [],
-        dashboards: {}
-      },
-      open_creator: false,
-      dashToCreate: {
-        name: "",
-        description: "",
-        lists: []
-      },
-      listAdder: ""
-    };
+    // this.state = {
+    //   dashboardsList: {
+    //     dashboardsIds: [],
+    //     dashboards: {}
+    //   },
+    //   open_creator: false,
+    //   dashToCreate: {
+    //     name: "",
+    //     description: "",
+    //     lists: []
+    //   },
+    //   listAdder: ""
+    // };
   }
   handleClose = () => {
     this.props.closeCreator();
@@ -150,11 +155,11 @@ class Dashboards extends Component<any, DashboardsState> {
     //   });
     // }
   };
-  updateListAdder = (params: any) => {
-    this.setState({
-      listAdder: params.target.value
-    });
-  };
+  // updateListAdder = (params: any) => {
+  //   this.setState({
+  //     listAdder: params.target.value
+  //   });
+  // };
   AddField = () => {
     return (
       <Box
@@ -185,6 +190,11 @@ class Dashboards extends Component<any, DashboardsState> {
       </Box>
     );
   };
+  handleRemoveList = (params: any) => (event: any) => {
+    console.log("remove item ", params);
+
+    this.props.actions.removeListToDashboardCreator(params);
+  };
   createItems = (params: any) => {
     return (
       <ListItem key={params}>
@@ -193,7 +203,9 @@ class Dashboards extends Component<any, DashboardsState> {
         </ListItemAvatar>
         <ListItemText primary={params} />
         <ListItemSecondaryAction>
-          <IconButton aria-label="Delete">
+          <IconButton
+            aria-label="Delete"
+            onClick={this.handleRemoveList(params)}>
             <DeleteIcon />
           </IconButton>
         </ListItemSecondaryAction>
@@ -206,6 +218,20 @@ class Dashboards extends Component<any, DashboardsState> {
       name += st[0].toUpperCase();
     });
     return name;
+  };
+  handleSnackClose = () => {
+    this._openSnack = false;
+  };
+  DashsRender = () => {
+    const dashboardsList = this.props.dashboardsIds.map((dash: any) => {
+      const dashb = this.props.dashboards[dash];
+      return (
+        <div key={dashb._id} className="dashboard-item">
+          {this.getShortName(dashb.title)}
+        </div>
+      );
+    });
+    return <React.Fragment>{dashboardsList}</React.Fragment>;
   };
   render() {
     var listItems = this.props.dashboardToCreate.lists.map(this.createItems);
@@ -281,14 +307,14 @@ class Dashboards extends Component<any, DashboardsState> {
         </DialogActions>
       </Dialog>
     );
-    const dashboardsList = this.props.dashboardsIds.map((dash: any) => {
-      const dashb = this.props.dashboards[dash];
-      return (
-        <div key={dashb._id} className="dashboard-item">
-          {this.getShortName(dashb.title)}
-        </div>
-      );
-    });
+    // const dashboardsList = this.props.dashboardsIds.map((dash: any) => {
+    //   const dashb = this.props.dashboards[dash];
+    //   return (
+    //     <div key={dashb._id} className="dashboard-item">
+    //       {this.getShortName(dashb.title)}
+    //     </div>
+    //   );
+    // });
     return (
       <Box
         direction="column"
@@ -310,15 +336,49 @@ class Dashboards extends Component<any, DashboardsState> {
           border={{ side: "top" }}
           margin={{ top: "small" }}
           pad={{ top: "small" }}>
-          {dashboardsList}
+          {this.props.dashboardsIds && this.props.dashboardsIds.length !== 0 ? (
+            <this.DashsRender />
+          ) : (
+            <CircularProgress color="secondary" style={{ margin: "auto" }} />
+          )}
         </Box>
         {createDialog}
+        {this.props.success && this.props.success.id === "DASHBOARDS" && (
+          <Snackbar
+            onClose={this.handleSnackClose}
+            open={this._openSnack}
+            className="snack-success"
+            autoHideDuration={6000}
+            aria-describedby="client-snackbar"
+            message={
+              <span id="client-snackbar">
+                <CheckCircleIcon />
+                {this.props.success.message}
+              </span>
+            }
+          />
+        )}
+        {this.props.error && this.props.error.id === "DASHBOARDS" && (
+          <Snackbar
+            onClose={this.handleSnackClose}
+            open={this._openSnack}
+            anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+            autoHideDuration={6000}
+            aria-describedby="client-snackbar"
+            // className="snack-error" // not working
+            message={
+              <span id="client-snackbar">
+                <ErrorIcon />
+                {this.props.error.dettails.message}
+              </span>
+            }
+          />
+        )}
       </Box>
     );
   }
 }
 const mapStateToProps = (state: any) => {
-  console.log(state);
   return {
     dashboardCreator: state.view.dashboardCreator,
     dashboardsIds: state.dashboards.dashboardsIDs,
@@ -327,7 +387,9 @@ const mapStateToProps = (state: any) => {
       title: state.dashboards.title,
       description: state.dashboards.description,
       lists: state.dashboards.lists
-    }
+    },
+    success: state.dashboards.success,
+    error: state.dashboards.error
   };
 };
 

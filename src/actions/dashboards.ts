@@ -1,7 +1,7 @@
 import * as Types from "./actionTypes";
 import dashboardApi from "../api/dashboardApi";
 import { netError } from "./net";
-import { func } from "prop-types";
+import { closeDashboardCreator } from "./view";
 export function loadDashboard(dashboard: any, user: any) {
   console.log("Fire action -> loadDashboard");
   return function(dispatch: any) {
@@ -62,6 +62,9 @@ export function loadDashboards(token: string) {
 export function addListToDashboardCreator(data: any) {
   return { type: Types.DASHBOARD_CREATOR_ADD_LIST, payload: data };
 }
+export function removeListToDashboardCreator(data: any) {
+  return { type: Types.DASHBOARD_CREATOR_REMOVE_LIST, payload: data };
+}
 export function createDashboard(dashboard: any, token: string) {
   console.log("Fire action -> createDashboard");
   return function(dispatch: any) {
@@ -71,6 +74,7 @@ export function createDashboard(dashboard: any, token: string) {
         if (response.status === 201) {
           let ndash = response.data;
           dispatch(createDashboardSuccess(ndash));
+          dispatch(closeDashboardCreator());
         } else {
           dispatch(
             createDashboardError({
@@ -105,7 +109,6 @@ export function updateDashboard(dashboard: any, user: any) {
       .updateDashboard(dashboard, user)
       .then(response => {
         if (response.status === 202) {
-          let ndash = response.data;
           dispatch(updateDashboardSuccess());
         } else if (response.status === 404) {
           dispatch(
