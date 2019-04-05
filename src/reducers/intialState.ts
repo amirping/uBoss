@@ -3,8 +3,10 @@ export default {
     dashboardsIDs: [],
     dashboards: {}
   },
-  selectedDashboardID: null,
-  selectedDashboardData: null,
+  loadedDashboard: {
+    selectedDashboardID: null,
+    selectedDashboardData: null
+  },
   dashboardTocreate: {
     // title: "",
     // description: "",
