@@ -1,6 +1,6 @@
 // import axios from "axios";
 import uuidv1 from "uuid";
-export default class AuthApi {
+export default class DashboardApi {
   static API_URL = "http://127.0.0.1:3333/api/dashboards/";
   static API_Header = new Headers({ "Content-Type": "application/json" });
   static getDashboards(token: string) {
@@ -20,13 +20,13 @@ export default class AuthApi {
         return error;
       });
   }
-  static getDashboard(user: any, dashboardId: string) {
+  static getDashboard(token: any, dashboardId: string) {
     console.log("Fire API -> getDashboard");
     const request = new Request(this.API_URL + dashboardId, {
       method: "GET",
       headers: new Headers({
         "Content-Type": "application/json",
-        AUTHORIZATION: `Bearer ${user.token}`
+        AUTHORIZATION: `Bearer ${token}`
       })
     });
     return fetch(request)
