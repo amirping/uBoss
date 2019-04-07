@@ -37,7 +37,7 @@ export default class DashboardApi {
         return error;
       });
   }
-  static updateDashboard(dashboard: any, user: any) {
+  static updateDashboard(dashboard: any, token: any) {
     console.log("Fire API -> updateDashboard");
     let newObej = {
       title: dashboard.title,
@@ -48,7 +48,7 @@ export default class DashboardApi {
       method: "PUT",
       headers: new Headers({
         "Content-Type": "application/json",
-        AUTHORIZATION: `Bearer ${user.token}`
+        AUTHORIZATION: `Bearer ${token}`
       }),
 
       body: JSON.stringify(newObej)

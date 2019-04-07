@@ -113,7 +113,7 @@ export function updateDashboard(dashboard: any, user: any) {
       .updateDashboard(dashboard, user)
       .then(response => {
         if (response.status === 202) {
-          dispatch(updateDashboardSuccess());
+          dispatch(updateDashboardSuccess(response.data));
         } else if (response.status === 404) {
           dispatch(
             updateDashboardError({ code: 404, message: "ressource not found" })
@@ -149,8 +149,8 @@ export function updateDashboard(dashboard: any, user: any) {
       });
   };
 }
-export function updateDashboardSuccess() {
-  return { type: Types.UPDATE_DASHBOARD_SUCCESS };
+export function updateDashboardSuccess(payload: any) {
+  return { type: Types.UPDATE_DASHBOARD_SUCCESS, payload: payload };
 }
 /**
  * @param error

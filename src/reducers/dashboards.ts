@@ -75,5 +75,21 @@ export default function dashboards(state: any = dashboardsState, action: any) {
       selectedDashboardData: null
     });
   }
+  if (action.type === Types.UPDATE_DASHBOARD_SUCCESS) {
+    return Object.assign({}, state, {
+      selectedDashboardData: action.payload,
+      success: {
+        id: "DASHBOARD",
+        message: "Your Dashboard Have been Updated"
+      },
+      error: null
+    });
+  }
+  if (action.type === Types.UPDATE_DASHBOARD_ERROR) {
+    return Object.assign({}, state, {
+      error: { id: "DASHBOARD", dettails: action.error },
+      success: null
+    });
+  }
   return state;
 }
