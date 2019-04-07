@@ -16,7 +16,8 @@ export default {
     sideMenu: true,
     profileManagement: false,
     userProfile_anchorEl: null,
-    dashboardCreator: false
+    dashboardCreator: false,
+    dashboardConfig: false
   },
   auth: {
     connected: !!localStorage.getItem("token"),

@@ -14,3 +14,9 @@ export function openDashboardCreator() {
 export function closeDashboardCreator() {
   return { type: Types.DASHBOARD_CREATOR_CLOSE };
 }
+export function openDashboardConfig() {
+  return { type: Types.DASHBOARD_CONFIG_OPEN };
+}
+export function closeDashboardConfig() {
+  return { type: Types.DASHBOARD_CONFIG_CLOSE };
+}
