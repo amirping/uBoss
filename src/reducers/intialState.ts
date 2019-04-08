@@ -8,8 +8,6 @@ export default {
     selectedDashboardData: null
   },
   dashboardTocreate: {
-    // title: "",
-    // description: "",
     lists: []
   },
   view: {
