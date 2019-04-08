@@ -26,7 +26,7 @@ import {
 } from "@material-ui/core";
 import { shortName } from "../../utils";
 import uuidv1 from "uuid";
-import { Box, Tabs, Tab, Form, Text } from "grommet";
+import { Box, Tabs, Tab, Form, Text, Paragraph } from "grommet";
 import EditIcon from "@material-ui/icons/Edit";
 import AddIcon from "@material-ui/icons/Add";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
@@ -262,6 +262,116 @@ class DashboardConfig extends Component<any, DashboardConfigState> {
     obj.lists = this._newListsForUpdate;
     this.props.actions.updateDashboard(obj, this._token);
   };
+  TransformOptions = () => {
+    const options = Object.keys(this.props.dashboard_data.lists).map(
+      (liID: any) => {
+        const li = this.props.dashboard_data.lists[liID];
+        return (
+          <MenuItem key={li.id} value={li.id}>
+            {li.name}
+          </MenuItem>
+        );
+      }
+    );
+    return <React.Fragment>{options}</React.Fragment>;
+  };
+  DashboardsTransformer = () => {
+    const dashsTs = this.state.dashboardData.loaded_dashboards.dashboardsIds.map(
+      (id: any) => {
+        const dash = this.state.dashboardData.loaded_dashboards.dashboards[id];
+        return (
+          <ExpansionPanel key={id}>
+            <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography>{dash.title}</Typography>
+            </ExpansionPanelSummary>
+            <ExpansionPanelDetails>
+              <Box direction="column" gap="small" fill>
+                <Typography>
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                  Suspendisse malesuada lacus ex, sit amet blandit leo lobortis
+                  eget.
+                </Typography>
+                {dash.listsIds.map((listID: any) => {
+                  const list = dash.loaded_lists[listID];
+                  return (
+                    <React.Fragment key={listID}>
+                      <Box
+                        pad="xsmall"
+                        gap="small"
+                        direction="row-responsive"
+                        fill="horizontal">
+                        <Box direction="column" justify="center">
+                          <Typography variant="subheading">
+                            Load cards From
+                          </Typography>
+                        </Box>
+                        <Box flex>
+                          <TextField
+                            variant="outlined"
+                            disabled={true}
+                            value={list.name}
+                            label="list to load from"
+                          />
+                        </Box>
+                        <Box direction="column" justify="center">
+                          <Typography variant="subheading">
+                            Into the list ➡
+                          </Typography>
+                        </Box>
+                        <Box flex>
+                          <Select
+                            onChange={event =>
+                              this.handleChangeTransform(event, listID, dash.id)
+                            }
+                            inputProps={{
+                              id: list.id
+                            }}
+                            input={
+                              <OutlinedInput
+                                name="Load into"
+                                id="jkjsdkjfnsdkjnf"
+                                labelWidth={150}
+                                inputProps={{
+                                  id: listID
+                                }}
+                              />
+                            }
+                            value={list.transformTo || ""}>
+                            <MenuItem value="">
+                              <em>None</em>
+                            </MenuItem>
+                            {Object.keys(this.props.dashboard_data.lists).map(
+                              (liID: any) => {
+                                const li = this.props.dashboard_data.lists[
+                                  liID
+                                ];
+                                return (
+                                  <MenuItem key={li.id} value={li.id}>
+                                    {li.name}
+                                  </MenuItem>
+                                );
+                              }
+                            )}
+                          </Select>
+                        </Box>
+                      </Box>
+                      <Divider />
+                    </React.Fragment>
+                  );
+                })}
+              </Box>
+            </ExpansionPanelDetails>
+            <ExpansionPanelActions>
+              <Button variant="contained" color="primary">
+                Save transformt
+              </Button>
+            </ExpansionPanelActions>
+          </ExpansionPanel>
+        );
+      }
+    );
+    return <React.Fragment>{dashsTs}</React.Fragment>;
+  };
   render() {
     var listItems = Object.keys(this.props.dashboard_data.lists).map(
       this.createItems
@@ -280,8 +390,8 @@ class DashboardConfig extends Component<any, DashboardConfigState> {
           scroll="paper">
           <DialogTitle>Dashboard Configuration</DialogTitle>
           <DialogContent>
-            <Box background="light-1" fill direction="column" justify="center">
-              <Tabs flex color="dark-1">
+            <Box background="light-0" fill direction="column" justify="center">
+              <Tabs flex color="light-0">
                 <Tab title="Dashboard Data" color="black">
                   <Form onSubmit={this.handleUpadet}>
                     <Box pad="small" flex direction="row-responsive">
@@ -337,116 +447,28 @@ class DashboardConfig extends Component<any, DashboardConfigState> {
                 </Tab>
                 <Tab title="Transform Data" color="black">
                   <Box pad="small" flex>
-                    {this.state.dashboardData.loaded_dashboards.dashboardsIds.map(
-                      (id: any) => {
-                        const dash = this.state.dashboardData.loaded_dashboards
-                          .dashboards[id];
-                        return (
-                          <ExpansionPanel key={id}>
-                            <ExpansionPanelSummary
-                              expandIcon={<ExpandMoreIcon />}>
-                              <Typography>{dash.title}</Typography>
-                            </ExpansionPanelSummary>
-                            <ExpansionPanelDetails>
-                              <Box direction="column" gap="small" fill>
-                                <Typography>
-                                  Lorem ipsum dolor sit amet, consectetur
-                                  adipiscing elit. Suspendisse malesuada lacus
-                                  ex, sit amet blandit leo lobortis eget.
-                                </Typography>
-                                {dash.listsIds.map((listID: any) => {
-                                  const list = dash.loaded_lists[listID];
-                                  return (
-                                    <React.Fragment key={listID}>
-                                      <Box
-                                        pad="xsmall"
-                                        gap="small"
-                                        direction="row-responsive"
-                                        fill="horizontal">
-                                        <Box
-                                          direction="column"
-                                          justify="center">
-                                          <Typography variant="subheading">
-                                            Load cards From
-                                          </Typography>
-                                        </Box>
-                                        <Box flex>
-                                          <TextField
-                                            variant="outlined"
-                                            disabled={true}
-                                            value={list.name}
-                                            label="list to load from"
-                                          />
-                                        </Box>
-                                        <Box
-                                          direction="column"
-                                          justify="center">
-                                          <Typography variant="subheading">
-                                            Into the list ➡
-                                          </Typography>
-                                        </Box>
-                                        <Box flex>
-                                          <Select
-                                            onChange={event =>
-                                              this.handleChangeTransform(
-                                                event,
-                                                listID,
-                                                dash.id
-                                              )
-                                            }
-                                            inputProps={{
-                                              id: list.id
-                                            }}
-                                            input={
-                                              <OutlinedInput
-                                                name="Load into"
-                                                id="jkjsdkjfnsdkjnf"
-                                                labelWidth={150}
-                                                inputProps={{
-                                                  id: listID
-                                                }}
-                                              />
-                                            }
-                                            value={list.transformTo || ""}>
-                                            <MenuItem value="">
-                                              <em>None</em>
-                                            </MenuItem>
-                                            {this.state.dashboardData.listsIds.map(
-                                              (liID: any) => {
-                                                const li = this.state
-                                                  .dashboardData.lists[liID];
-                                                return (
-                                                  <MenuItem
-                                                    key={li.id}
-                                                    value={li.id}>
-                                                    {li.title}
-                                                  </MenuItem>
-                                                );
-                                              }
-                                            )}
-                                          </Select>
-                                        </Box>
-                                      </Box>
-                                      <Divider />
-                                    </React.Fragment>
-                                  );
-                                })}
-                              </Box>
-                            </ExpansionPanelDetails>
-                            <ExpansionPanelActions>
-                              <Button variant="contained" color="primary">
-                                Save transformt
-                              </Button>
-                            </ExpansionPanelActions>
-                          </ExpansionPanel>
-                        );
-                      }
-                    )}
+                    <this.DashboardsTransformer />
                   </Box>
                 </Tab>
                 <Tab title="Load Dashboards" color="black">
                   <Box pad="small" flex>
-                    Two
+                    {this.props.user.trello_token &&
+                    this.props.user.trello_token.length !== 0 ? (
+                      <div>Load your dashboards by selecting em</div>
+                    ) : (
+                      <Box direction="column" justify="around" pad="medium">
+                        <Paragraph>
+                          Welcome in uBoos , before you start boosing, we first
+                          need you to connect to your trello account by clicking
+                          on the button below. a popup will be shown from trello
+                          asking you to coonect and approve the connection ,
+                          validates and we will take care of the other things
+                        </Paragraph>
+                        <Button variant="outlined" color="primary">
+                          Connect trello
+                        </Button>
+                      </Box>
+                    )}
                   </Box>
                 </Tab>
               </Tabs>
@@ -466,7 +488,8 @@ const mapStateToProps = (state: any) => {
     success: state.dashboards.success,
     error: state.dashboards.error,
     selected_dashboard: state.dashboards.selectedDashboardID,
-    dashboard_data: state.dashboards.selectedDashboardData
+    dashboard_data: state.dashboards.selectedDashboardData,
+    user: state.auth.user
   };
 };
 
