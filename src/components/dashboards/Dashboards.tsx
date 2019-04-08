@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Box, Form, Text } from "grommet";
 import "./Dashboards.css";
+import { shortName } from "../../utils";
 import Fab from "@material-ui/core/Fab";
 import AddIcon from "@material-ui/icons/Add";
 import DeleteIcon from "@material-ui/icons/Delete";
@@ -199,7 +200,7 @@ class Dashboards extends Component<any, DashboardsState> {
     return (
       <ListItem key={params}>
         <ListItemAvatar>
-          <Avatar>{params}</Avatar>
+          <Avatar>{shortName(params)}</Avatar>
         </ListItemAvatar>
         <ListItemText primary={params} />
         <ListItemSecondaryAction>
@@ -238,7 +239,7 @@ class Dashboards extends Component<any, DashboardsState> {
               : "")
           }
           onClick={this.handledashboardSelect(dashb._id)}>
-          {this.getShortName(dashb.title)}
+          {shortName(dashb.title)}
         </div>
       );
     });

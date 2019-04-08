@@ -24,12 +24,18 @@ import {
   Divider,
   OutlinedInput
 } from "@material-ui/core";
+import { shortName } from "../../utils";
+import uuidv1 from "uuid";
 import { Box, Tabs, Tab, Form, Text } from "grommet";
 import EditIcon from "@material-ui/icons/Edit";
 import AddIcon from "@material-ui/icons/Add";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import DeleteIcon from "@material-ui/icons/Delete";
 import { Value } from "../../../types/grommet-controls.d";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import * as dashboardsActions from "../../actions/dashboards";
+import { openDashboardConfig, closeDashboardConfig } from "../../actions/view";
 export interface DashboardConfigProps {}
 
 export interface DashboardConfigState {
@@ -38,13 +44,14 @@ export interface DashboardConfigState {
   dashboardData: any;
 }
 
-class DashboardConfig extends Component<
-  DashboardConfigProps,
-  DashboardConfigState
-> {
-  name: any;
-  descrp: any;
-  constructor(props: DashboardConfigProps) {
+class DashboardConfig extends Component<any, DashboardConfigState> {
+  _name: any;
+  _descrp: any;
+  _listAdderField: any;
+  _listsForUpdate: string[] = [];
+  _token: any;
+  _newListsForUpdate: any;
+  constructor(props: any) {
     super(props);
     this.state = {
       show: false,
@@ -120,40 +127,70 @@ class DashboardConfig extends Component<
       }
     };
   }
+  componentDidMount() {
+    this._token = localStorage.getItem("token");
+    this._listsForUpdate = Object.keys(this.props.dashboard_data.lists);
+    this._newListsForUpdate = this.props.dashboard_data.lists;
+  }
   handleClose = () => {
-    this.setState({ show: false });
+    this.props.closeConfig();
   };
   handleOpen = () => {
-    this.setState({ show: true });
+    this.props.openConfig();
   };
-  updateListAdder = (params: any) => {
-    this.setState({ listAdder: params.target.value });
-  };
+  // updateListAdder = (params: any) => {
+  //   this.setState({ listAdder: params.target.value });
+  // };
   handleAddList = () => {
-    if (this.state.listAdder.length === 0) {
+    // if (this.state.listAdder.length === 0) {
+    //   alert("you need to name it");
+    //   return false;
+    // }
+    // var listIs = {
+    //   id: this.state.listAdder,
+    //   title: this.state.listAdder
+    // };
+    // var allk = this.state.dashboardData.listsIds.filter((obj: any) => {
+    //   return obj === this.state.listAdder;
+    // });
+    // if (allk.length != 0) {
+    //   console.log("already exist");
+    // } else {
+    //   var newValues = this.state.dashboardData;
+    //   newValues.lists[listIs.id] = listIs;
+    //   newValues.listsIds.push(listIs.id);
+    //   console.log(newValues);
+    //   this.setState({
+    //     // add list to lists
+    //     dashboardData: newValues,
+    //     listAdder: ""
+    //   });
+    // }
+    let listVal = this._listAdderField.value;
+    if (listVal.length === 0) {
       alert("you need to name it");
       return false;
     }
-    var listIs = {
-      id: this.state.listAdder,
-      title: this.state.listAdder
-    };
-    var allk = this.state.dashboardData.listsIds.filter((obj: any) => {
-      return obj === this.state.listAdder;
-    });
-    if (allk.length != 0) {
-      console.log("already exist");
+    if (this._listsForUpdate.includes(listVal)) {
+      alert("the list name must be unique");
     } else {
-      var newValues = this.state.dashboardData;
-      newValues.lists[listIs.id] = listIs;
-      newValues.listsIds.push(listIs.id);
-      console.log(newValues);
-      this.setState({
-        // add list to lists
-        dashboardData: newValues,
-        listAdder: ""
-      });
+      this._listsForUpdate.push(listVal); // for next tests
+      const code = uuidv1();
+      this._newListsForUpdate[code] = {
+        id: code,
+        name: listVal
+      };
+      let obj = this.props.dashboard_data;
+      obj.lists = this._newListsForUpdate;
+      this.props.actions.updateDashboard(obj, this._token);
+      this._listAdderField.value = "";
     }
+  };
+  handleRemoveList = (listID: string) => (event: any) => {
+    console.log("remove this :", listID);
+    let obj = this.props.dashboard_data;
+    delete obj.lists[listID];
+    this.props.actions.updateDashboard(obj, this._token);
   };
   handleChangeTransform = (event: any, sourceListId: any, dashboardId: any) => {
     let newData = this.state.dashboardData;
@@ -179,11 +216,14 @@ class DashboardConfig extends Component<
         }}>
         <InputBase
           className="add-f-input"
-          placeholder="A lidt name to be created"
+          placeholder="A list name to be created"
           name="list_name"
           id="list_name"
-          value={this.state.listAdder}
-          onChange={this.updateListAdder}
+          // value={this.state.listAdder}
+          // onChange={this.updateListAdder}
+          inputProps={{
+            ref: (node: any) => (this._listAdderField = node)
+          }}
         />
         <IconButton
           className="add-f-iconButton"
@@ -194,31 +234,45 @@ class DashboardConfig extends Component<
       </Box>
     );
   };
-  createItems = (params: any) => {
-    const listdata = this.state.dashboardData.lists[params];
+  createItems = (idList: any) => {
+    const listdata = this.props.dashboard_data.lists[idList];
     return (
-      <ListItem key={listdata.id}>
+      <ListItem key={idList}>
         <ListItemAvatar>
-          <Avatar>{listdata.title}</Avatar>
+          <Avatar>{shortName(listdata.name)}</Avatar>
         </ListItemAvatar>
-        <ListItemText primary={listdata.title} />
+        <ListItemText primary={listdata.name} />
         <ListItemSecondaryAction>
-          <IconButton aria-label="Delete">
+          <IconButton
+            aria-label="Delete"
+            onClick={this.handleRemoveList(idList)}>
             <DeleteIcon />
           </IconButton>
         </ListItemSecondaryAction>
       </ListItem>
     );
   };
+  handleUpadet = (event: any) => {
+    //event.preventDefualt();
+    const name = this._name.value;
+    const descrp = this._descrp.value;
+    let obj = this.props.dashboard_data;
+    obj.title = name;
+    obj.description = descrp;
+    obj.lists = this._newListsForUpdate;
+    this.props.actions.updateDashboard(obj, this._token);
+  };
   render() {
-    var listItems = this.state.dashboardData.listsIds.map(this.createItems);
+    var listItems = Object.keys(this.props.dashboard_data.lists).map(
+      this.createItems
+    );
     return (
       <Box>
         <IconButton onClick={this.handleOpen}>
           <EditIcon fontSize="small" />
         </IconButton>
         <Dialog
-          open={this.state.show}
+          open={this.props.dashboardConfig}
           onClose={this.handleClose}
           fullWidth={true}
           fullScreen
@@ -229,52 +283,57 @@ class DashboardConfig extends Component<
             <Box background="light-1" fill direction="column" justify="center">
               <Tabs flex color="dark-1">
                 <Tab title="Dashboard Data" color="black">
-                  <Box pad="small" flex direction="row-responsive">
-                    <Box direction="column" flex>
-                      <TextField
-                        id="name"
-                        label="Dashboard Name"
-                        defaultValue=""
-                        margin="normal"
-                        variant="outlined"
-                        required
-                        placeholder="Give it a name"
-                        autoFocus={true}
-                        helperText="Provide a name for you new dashboard"
-                        name="name"
-                        inputProps={{
-                          ref: (node: any) => (this.name = node)
-                        }}
-                      />
+                  <Form onSubmit={this.handleUpadet}>
+                    <Box pad="small" flex direction="row-responsive">
+                      <Box direction="column" flex>
+                        <TextField
+                          id="name"
+                          label="Dashboard Name"
+                          defaultValue={this.props.dashboard_data.title}
+                          margin="normal"
+                          variant="outlined"
+                          required
+                          placeholder="Give it a name"
+                          autoFocus={true}
+                          helperText="Provide a name for you new dashboard"
+                          name="name"
+                          inputProps={{
+                            ref: (node: any) => (this._name = node)
+                          }}
+                        />
 
-                      <TextField
-                        multiline={true}
-                        id="descrp"
-                        label="Dashboard descrp"
-                        defaultValue=""
-                        margin="normal"
-                        variant="outlined"
-                        required
-                        placeholder="Give it a descrp"
-                        helperText="Provide a descrp for you new dashboard"
-                        name="descrp"
-                        rows="3"
-                        inputProps={{
-                          ref: (node: any) => (this.descrp = node)
-                        }}
-                      />
-                    </Box>
-                    <Box pad="small" flex direction="column">
-                      <Text size="medium">Lists Creation</Text>
-                      <Box direction="column">
-                        <Text size="small" color="#f03434">
-                          Each list must have an unique name
-                        </Text>
-                        <List dense={true}>{listItems}</List>
+                        <TextField
+                          multiline={true}
+                          id="descrp"
+                          label="Dashboard descrp"
+                          defaultValue={this.props.dashboard_data.description}
+                          margin="normal"
+                          variant="outlined"
+                          required
+                          placeholder="Give it a descrp"
+                          helperText="Provide a descrp for you new dashboard"
+                          name="descrp"
+                          rows="3"
+                          inputProps={{
+                            ref: (node: any) => (this._descrp = node)
+                          }}
+                        />
                       </Box>
-                      <this.AddField />
+                      <Box pad="small" flex direction="column">
+                        <Text size="medium">Lists Creation</Text>
+                        <Box direction="column">
+                          {/* <Text size="small" color="#f03434">
+                          Each list must have an unique name
+                        </Text> */}
+                          <List dense={true}>{listItems}</List>
+                        </Box>
+                        <this.AddField />
+                      </Box>
                     </Box>
-                  </Box>
+                    <Button variant="outlined" color="primary" type="submit">
+                      Save changes
+                    </Button>
+                  </Form>
                 </Tab>
                 <Tab title="Transform Data" color="black">
                   <Box pad="small" flex>
@@ -401,5 +460,24 @@ class DashboardConfig extends Component<
     );
   }
 }
+const mapStateToProps = (state: any) => {
+  return {
+    dashboardConfig: state.view.dashboardConfig,
+    success: state.dashboards.success,
+    error: state.dashboards.error,
+    selected_dashboard: state.dashboards.selectedDashboardID,
+    dashboard_data: state.dashboards.selectedDashboardData
+  };
+};
 
-export default DashboardConfig;
+const mapDispatchToProps = (dispatch: any) => {
+  return {
+    openConfig: () => dispatch(openDashboardConfig()),
+    closeConfig: () => dispatch(closeDashboardConfig()),
+    actions: bindActionCreators(dashboardsActions, dispatch)
+  };
+};
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(DashboardConfig);

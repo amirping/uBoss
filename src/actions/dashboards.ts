@@ -69,6 +69,12 @@ export function addListToDashboardCreator(data: any) {
 export function removeListToDashboardCreator(data: any) {
   return { type: Types.DASHBOARD_CREATOR_REMOVE_LIST, payload: data };
 }
+export function addListToDashboard(data: any) {
+  return { type: Types.DASHBOARD_ADD_LIST, payload: data };
+}
+export function removeListToDashboard(data: any) {
+  return { type: Types.DASHBOARD_REMOVE_LIST, payload: data };
+}
 export function createDashboard(dashboard: any, token: string) {
   console.log("Fire action -> createDashboard");
   return function(dispatch: any) {
@@ -106,11 +112,11 @@ export function loadDashboardError(error: any) {
 export function loadDashboardsError(error: any) {
   return { type: Types.LOAD_DASHBOARDS_ERROR, error: error };
 }
-export function updateDashboard(dashboard: any, user: any) {
+export function updateDashboard(dashboard: any, token: any) {
   console.log("Fire action -> updateDashboard");
   return function(dispatch: any) {
     return dashboardApi
-      .updateDashboard(dashboard, user)
+      .updateDashboard(dashboard, token)
       .then(response => {
         if (response.status === 202) {
           dispatch(updateDashboardSuccess(response.data));

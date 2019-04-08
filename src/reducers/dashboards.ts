@@ -88,7 +88,8 @@ export default function dashboards(state: any = dashboardsState, action: any) {
   if (action.type === Types.UPDATE_DASHBOARD_ERROR) {
     return Object.assign({}, state, {
       error: { id: "DASHBOARD", dettails: action.error },
-      success: null
+      success: null,
+      selectedDashboardData: state.selectedDashboardData // keep the same -> not sure
     });
   }
   return state;
