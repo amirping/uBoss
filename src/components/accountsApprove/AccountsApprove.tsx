@@ -10,7 +10,7 @@ import {
   Button
 } from "@material-ui/core";
 import { connect } from "react-redux";
-import { approveAccount } from "../../actions/user";
+import { approveAccount, endApproveAccount } from "../../actions/user";
 export interface AccountsApproveProps {
   match: any;
 }
@@ -41,7 +41,7 @@ class AccountsApprove extends Component<any, AccountsApproveState> {
     //console.log(newUserToUpdate.accounts);
     setTimeout(() => {
       this.props.approveAccount(newUserToUpdate, this._token);
-    }, 10000);
+    }, 5000);
   }
   componentDidUpdate() {
     if (!this.props.approvingAction) {
@@ -54,6 +54,8 @@ class AccountsApprove extends Component<any, AccountsApproveState> {
     window.close();
   };
   render() {
+    const suc = this.props.success && this.props.success.id === "AAPROVE";
+    const err = this.props.error && this.props.error.id === "AAPROVE";
     return (
       <Box
         fill
@@ -75,23 +77,25 @@ class AccountsApprove extends Component<any, AccountsApproveState> {
 
               <span>{this.props.match.params.accountType}</span>
             </Box>
-            {this.props.approvingAction === true && (
-              <Card>
-                <CardContent>
-                  <Box direction="row-responsive" gap="10px">
-                    <Text>
-                      Hi {this.props.user.name} , we are working so hard to link
-                      your accounts together. you will redirect back once we've
-                      done
-                    </Text>
-                    <CircularProgress
-                      color="secondary"
-                      style={{ margin: "auto" }}
-                    />
-                  </Box>
-                </CardContent>
-              </Card>
-            )}
+            {this.props.approvingAction === true &&
+              !(this.props.success && this.props.success.id === "AAPROVE") &&
+              !(this.props.error && this.props.error.id === "APPROVE") && (
+                <Card>
+                  <CardContent>
+                    <Box direction="row-responsive" gap="10px">
+                      <Text>
+                        Hi {this.props.user.name} , we are working so hard to
+                        link your accounts together. you will redirect back once
+                        we've done
+                      </Text>
+                      <CircularProgress
+                        color="secondary"
+                        style={{ margin: "auto" }}
+                      />
+                    </Box>
+                  </CardContent>
+                </Card>
+              )}
             {this.props.success && this.props.success.id === "APPROVE" && (
               <Card className="success">
                 <CardContent>
@@ -143,7 +147,8 @@ const mapStateToProps = (state: any) => {
 const mapDispatchToProps = (dispatch: any) => {
   return {
     approveAccount: (user: string, token: string) =>
-      dispatch(approveAccount(user, token))
+      dispatch(approveAccount(user, token)),
+    endApproveAccount: () => dispatch(endApproveAccount())
   };
 };
 

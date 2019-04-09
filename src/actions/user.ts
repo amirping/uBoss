@@ -126,6 +126,10 @@ export function startApproveAccount() {
   localStorage.setItem("approvingAction", "true");
   return { type: Types.APPROVE_ACCOUNT };
 }
+export function endApproveAccount() {
+  localStorage.removeItem("approvingAction");
+  return { type: Types.APPROVE_ACCOUNT_END };
+}
 export function approveAccount(user: any, token: string) {
   console.log("start approve now");
   return function(dispatch: any) {

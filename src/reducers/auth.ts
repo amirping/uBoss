@@ -56,7 +56,10 @@ export default function auth(state = authState, action: any) {
       user: JSON.parse(localStorage.getItem("user") || "null")
     });
   }
-  if (action.type === Types.APPROVE_ACCOUNT) {
+  if (
+    action.type === Types.APPROVE_ACCOUNT ||
+    action.type === Types.APPROVE_ACCOUNT_END
+  ) {
     return Object.assign({}, state, {
       approvingAction: JSON.parse(
         localStorage.getItem("approvingAction") || "null"

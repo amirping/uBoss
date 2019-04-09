@@ -36,7 +36,7 @@ import { bindActionCreators } from "redux";
 import * as dashboardsActions from "../../actions/dashboards";
 import { openDashboardConfig, closeDashboardConfig } from "../../actions/view";
 import userApi from "../../api/userApi";
-import { startApproveAccount } from "../../actions/user";
+import { startApproveAccount, endApproveAccount } from "../../actions/user";
 export interface DashboardConfigProps {}
 
 export interface DashboardConfigState {
@@ -374,12 +374,23 @@ class DashboardConfig extends Component<any, DashboardConfigState> {
     return <React.Fragment>{dashsTs}</React.Fragment>;
   };
   connectTrello = () => {
+    const self = this
     userApi
       .connectTrello(this._token, this.props.user)
       .then((data: any) => {
         console.log(data);
         this.props.startApprove();
-        window.open(data.link, "_blank");
+        try{
+          let w = window.open(data.link, "_blank");
+          if(w!==null){
+            w.addEventListener("beforeunload", function(e){
+              console.log("fire the close process")
+              self.props.endApproveAccount();
+            }, false);
+          }
+        }catch(err){
+          console.log(err)
+        }
       })
       .catch((error: any) => {
         console.log(error);
@@ -516,7 +527,8 @@ const mapDispatchToProps = (dispatch: any) => {
     openConfig: () => dispatch(openDashboardConfig()),
     closeConfig: () => dispatch(closeDashboardConfig()),
     actions: bindActionCreators(dashboardsActions, dispatch),
-    startApprove: () => dispatch(startApproveAccount())
+    startApprove: () => dispatch(startApproveAccount()),
+    endApproveAccount: () => dispatch(endApproveAccount())
   };
 };
 export default connect(
