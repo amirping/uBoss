@@ -37,9 +37,13 @@ class UserProfile extends Component<any, UserProfileState> {
     new_password: "",
     new_password_confirmation: ""
   };
+  _token: any;
   constructor(props: any) {
     super(props);
     this.state = { anchorEl: null };
+  }
+  componentDidMount() {
+    this._token = localStorage.getItem("token");
   }
   handleClick = (event: any) => {
     this.setState({ anchorEl: event.currentTarget });
@@ -50,10 +54,9 @@ class UserProfile extends Component<any, UserProfileState> {
     let updateObject = {
       _id: this.props.user._id,
       name: this._userForm.name,
-      email: this._userForm.email,
-      token: localStorage.getItem("token")
+      email: this._userForm.email
     };
-    this.props.actions.updateUser(updateObject);
+    this.props.actions.updateUser(updateObject, this._token);
   };
   updateUserSecurity = (event: any) => {
     event.preventDefault();

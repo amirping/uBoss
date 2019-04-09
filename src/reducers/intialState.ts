@@ -19,6 +19,9 @@ export default {
   },
   auth: {
     connected: !!localStorage.getItem("token"),
+    approvingAction: JSON.parse(
+      localStorage.getItem("approvingAction") || "null"
+    ),
     user: JSON.parse(localStorage.getItem("user") || "null")
   },
   system: { success: null, error: null }

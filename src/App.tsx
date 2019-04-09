@@ -11,6 +11,7 @@ import {
 import NoMatch from "./components/noMatch/NoMatch";
 import Home from "./components/home/Home";
 import { connect } from "react-redux";
+import AccountsApprove from "./components/accountsApprove/AccountsApprove";
 const theme = {
   global: {
     colors: {
@@ -55,6 +56,18 @@ class App extends Component<any, AppState> {
                   !this.props.connected ? <AuthComp /> : <Redirect to="/in" />
                 }
               />
+              <Route
+                exact
+                // render={() =>
+                //   this.props.approvingAction ? (
+                //     <AccountsApprove />
+                //   ) : (
+                //     <Redirect to="/in" />
+                //   )
+                // }
+                path="/approveAccounts/:accountType/"
+                component={AccountsApprove}
+              />
               <Route component={NoMatch} />
             </Switch>
           </Router>
@@ -65,7 +78,8 @@ class App extends Component<any, AppState> {
 }
 const mapStateToProps = (state: any) => {
   return {
-    connected: state.auth.connected
+    connected: state.auth.connected,
+    approvingAction: state.auth.approvingAction
   };
 };
 

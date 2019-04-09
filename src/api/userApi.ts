@@ -1,5 +1,5 @@
 // import axios from "axios";
-export default class AuthApi {
+export default class UserApi {
   static API_URL = "http://127.0.0.1:3333/api/users/";
   static API_URL_AUTH_PASSWORD = "http://127.0.0.1:3333/api/auth/password";
   static API_Header = new Headers({ "Content-Type": "application/json" });
@@ -21,17 +21,18 @@ export default class AuthApi {
         return error;
       });
   }
-  static updateUser(user: any) {
+  static updateUser(user: any, token: string) {
     console.log("Fire API -> updateUser");
     let newObej = {
       name: user.name,
-      email: user.email
+      email: user.email,
+      accounts: user.accounts || null
     };
     const request = new Request(this.API_URL + user._id, {
       method: "PUT",
       headers: new Headers({
         "Content-Type": "application/json",
-        AUTHORIZATION: `Bearer ${user.token}`
+        AUTHORIZATION: `Bearer ${token}`
       }),
 
       body: JSON.stringify(newObej)
@@ -66,4 +67,35 @@ export default class AuthApi {
         return error;
       });
   }
+  static connectTrello(token: string, user: any) {
+    const request = new Request(this.API_URL + user._id + "/asktrello", {
+      method: "POST",
+      redirect: "follow",
+      headers: new Headers({
+        "Content-Type": "application/json",
+        AUTHORIZATION: `Bearer ${token}`
+      })
+    });
+    return fetch(request)
+      .then(response => {
+        //console.log(response.json());
+        return response.json();
+      })
+      .catch(error => {
+        return error;
+      });
+  }
+  /**
+   * removed by passing into more modulaire system for accounts approving
+   */
+  // static approveTrello(token: string, accountToken: string) {
+  //   const request = new Request(this.API_URL);
+  //   return fetch(request)
+  //     .then(response => {
+  //       return response.json();
+  //     })
+  //     .catch(error => {
+  //       return error;
+  //     });
+  // }
 }

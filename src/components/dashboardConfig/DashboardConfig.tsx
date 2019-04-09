@@ -31,11 +31,12 @@ import EditIcon from "@material-ui/icons/Edit";
 import AddIcon from "@material-ui/icons/Add";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import DeleteIcon from "@material-ui/icons/Delete";
-import { Value } from "../../../types/grommet-controls.d";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import * as dashboardsActions from "../../actions/dashboards";
 import { openDashboardConfig, closeDashboardConfig } from "../../actions/view";
+import userApi from "../../api/userApi";
+import { startApproveAccount } from "../../actions/user";
 export interface DashboardConfigProps {}
 
 export interface DashboardConfigState {
@@ -372,6 +373,19 @@ class DashboardConfig extends Component<any, DashboardConfigState> {
     );
     return <React.Fragment>{dashsTs}</React.Fragment>;
   };
+  connectTrello = () => {
+    userApi
+      .connectTrello(this._token, this.props.user)
+      .then((data: any) => {
+        console.log(data);
+        this.props.startApprove();
+        window.open(data.link, "_blank");
+      })
+      .catch((error: any) => {
+        console.log(error);
+        alert("please check your internet access");
+      });
+  };
   render() {
     var listItems = Object.keys(this.props.dashboard_data.lists).map(
       this.createItems
@@ -452,8 +466,9 @@ class DashboardConfig extends Component<any, DashboardConfigState> {
                 </Tab>
                 <Tab title="Load Dashboards" color="black">
                   <Box pad="small" flex>
-                    {this.props.user.trello_token &&
-                    this.props.user.trello_token.length !== 0 ? (
+                    {this.props.user.accounts &&
+                    this.props.user.accounts.trello &&
+                    this.props.user.accounts.trello.token.length !== 0 ? (
                       <div>Load your dashboards by selecting em</div>
                     ) : (
                       <Box direction="column" justify="around" pad="medium">
@@ -464,7 +479,10 @@ class DashboardConfig extends Component<any, DashboardConfigState> {
                           asking you to coonect and approve the connection ,
                           validates and we will take care of the other things
                         </Paragraph>
-                        <Button variant="outlined" color="primary">
+                        <Button
+                          variant="outlined"
+                          onClick={this.connectTrello}
+                          color="primary">
                           Connect trello
                         </Button>
                       </Box>
@@ -497,7 +515,8 @@ const mapDispatchToProps = (dispatch: any) => {
   return {
     openConfig: () => dispatch(openDashboardConfig()),
     closeConfig: () => dispatch(closeDashboardConfig()),
-    actions: bindActionCreators(dashboardsActions, dispatch)
+    actions: bindActionCreators(dashboardsActions, dispatch),
+    startApprove: () => dispatch(startApproveAccount())
   };
 };
 export default connect(
