@@ -29,4 +29,18 @@ export default class TrelloApi {
         return error;
       });
   }
+  static moveCard(
+    user_token: string,
+    board_id: string,
+    card_id: string,
+    list_id: string
+  ) {}
+  static addCard(user_token: string, board_id: string, list_id: string) {}
+  static removeCard(user_token: string, board_id: string, list_id: string) {}
+  static updateCard(
+    user_token: string,
+    card_id: string,
+    list_id: string,
+    data: any
+  ) {}
 }
