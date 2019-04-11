@@ -56,29 +56,50 @@ export default function auth(state = authState, action: any) {
       user: JSON.parse(localStorage.getItem("user") || "null")
     });
   }
-  if (
-    action.type === Types.APPROVE_ACCOUNT ||
-    action.type === Types.APPROVE_ACCOUNT_END
-  ) {
+  if (action.type === Types.APPROVE_ACCOUNT) {
     return Object.assign({}, state, {
       approvingAction: JSON.parse(
         localStorage.getItem("approvingAction") || "null"
       )
     });
   }
+  if (action.type === Types.APPROVE_ACCOUNT_END) {
+    return Object.assign({}, state, {
+      endApprovingAction: JSON.parse(
+        localStorage.getItem("endApprovingAction") || "null"
+      )
+    });
+  }
+
   if (action.type === Types.APPROVE_ACCOUNT_SUCCESS) {
     return Object.assign({}, state, {
       //approvingAction: false,
       success: { id: "APPROVE" },
       error: null,
-      user: JSON.parse(localStorage.getItem("user") || "null")
+      user: JSON.parse(localStorage.getItem("user") || "null"),
+      endApprovingAction: JSON.parse(
+        localStorage.getItem("endApprovingAction") || "null"
+      )
+    });
+  }
+  if (action.type === Types.APPROVE_ACTION_RESET) {
+    return Object.assign({}, state, {
+      approvingAction: JSON.parse(
+        localStorage.getItem("approvingAction") || "null"
+      ),
+      endApprovingAction: JSON.parse(
+        localStorage.getItem("endApprovingAction") || "null"
+      )
     });
   }
   if (action.type === Types.APPROVE_ACCOUNT_ERROR) {
     return Object.assign({}, state, {
       //approvingAction: false,
       error: { id: "APPROVE", dettails: action.error },
-      success: null
+      success: null,
+      endApprovingAction: JSON.parse(
+        localStorage.getItem("endApprovingAction") || "null"
+      )
     });
   }
   return state;

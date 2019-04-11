@@ -81,7 +81,7 @@ class AuthComp extends Component<any, AuthCompState> {
                         top: "medium"
                       }}
                       weight={400}>
-                      uBoos / Sign up
+                      uBoss / Sign up
                     </Text>
                     {this.props.success && this.props.success.id === "SIGNUP" && (
                       <Box
@@ -173,7 +173,7 @@ class AuthComp extends Component<any, AuthCompState> {
                         top: "medium"
                       }}
                       weight={400}>
-                      uBoos / Sign in
+                      uBoss / Sign in
                     </Text>
                     {this.props.error && this.props.error.id === "LOGIN" && (
                       <Box

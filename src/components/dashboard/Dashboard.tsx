@@ -4,7 +4,7 @@ import { IconButton, Icon, CircularProgress } from "@material-ui/core";
 import EditIcon from "@material-ui/icons/Edit";
 import "./Dashboard.css";
 import img_Pick from "./pick.png";
-import img_Boost from "./animat-rocket-color.gif";
+import img_Bosst from "./animat-rocket-color.gif";
 import ListItem from "../list/ListItem";
 import DashboardConfig from "../dashboardConfig/DashboardConfig";
 import { connect } from "react-redux";
@@ -99,7 +99,7 @@ class Dashboard extends Component<any, DashboardState> {
           <Box fill flex direction="column" justify="around">
             <Box direction="row" justify="around">
               <img
-                src={img_Boost}
+                src={img_Bosst}
                 alt="where are you"
                 height="400px"
                 style={{ opacity: 0.5 }}

@@ -22,8 +22,11 @@ import {
   Select,
   MenuItem,
   Divider,
-  OutlinedInput
+  OutlinedInput,
+  Switch,
+  ListItemIcon
 } from "@material-ui/core";
+import { Connect } from "grommet-icons";
 import { shortName } from "../../utils";
 import uuidv1 from "uuid";
 import { Box, Tabs, Tab, Form, Text, Paragraph } from "grommet";
@@ -34,9 +37,12 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import * as dashboardsActions from "../../actions/dashboards";
+import * as userActions from "../../actions/user";
 import { openDashboardConfig, closeDashboardConfig } from "../../actions/view";
 import userApi from "../../api/userApi";
+import "./DashboardConfig.css";
 import { startApproveAccount, endApproveAccount } from "../../actions/user";
+import TrelloApi from "../../api/trelloApi";
 export interface DashboardConfigProps {}
 
 export interface DashboardConfigState {
@@ -52,6 +58,7 @@ class DashboardConfig extends Component<any, DashboardConfigState> {
   _listsForUpdate: string[] = [];
   _token: any;
   _newListsForUpdate: any;
+  _userAccountsBoards: any = {};
   constructor(props: any) {
     super(props);
     this.state = {
@@ -129,9 +136,52 @@ class DashboardConfig extends Component<any, DashboardConfigState> {
     };
   }
   componentDidMount() {
+    console.log("mounted");
     this._token = localStorage.getItem("token");
     this._listsForUpdate = Object.keys(this.props.dashboard_data.lists);
     this._newListsForUpdate = this.props.dashboard_data.lists;
+    // if user have connected accounts -> load all bards possible
+    // console.log(this.props.user.accounts);
+    if (
+      this.props.user.accounts &&
+      Object.keys(this.props.user.accounts).length > 0
+    ) {
+      console.log("start fetching for accounts");
+      const allAccounts = Object.keys(this.props.user.accounts);
+      allAccounts.map((account: any) => {
+        const accountD = this.props.user.accounts[account];
+        this._userAccountsBoards[accountD.accountType] = {};
+        switch (accountD.accountType) {
+          case "trello": {
+            console.log("trello start loading");
+            TrelloApi.getUser(accountD.token)
+              .then(response => {
+                this._userAccountsBoards[accountD.accountType][
+                  "user"
+                ] = response;
+              })
+              .catch(error => {
+                console.log(error);
+              });
+            TrelloApi.getBoards(accountD.token)
+              .then(response => {
+                this._userAccountsBoards[accountD.accountType][
+                  "boards"
+                ] = response;
+              })
+              .catch(error => {
+                console.log(error);
+                // tell user about that
+              });
+            break;
+          }
+
+          default:
+            console.log("some accounts are not supported right now");
+            break;
+        }
+      });
+    }
   }
   handleClose = () => {
     this.props.closeConfig();
@@ -187,7 +237,7 @@ class DashboardConfig extends Component<any, DashboardConfigState> {
       this._listAdderField.value = "";
     }
   };
-  handleRemoveList = (listID: string) => (event: any) => {
+  handleRemoveList = (listID: string) => () => {
     console.log("remove this :", listID);
     let obj = this.props.dashboard_data;
     delete obj.lists[listID];
@@ -253,7 +303,7 @@ class DashboardConfig extends Component<any, DashboardConfigState> {
       </ListItem>
     );
   };
-  handleUpadet = (event: any) => {
+  handleUpadet = () => {
     //event.preventDefualt();
     const name = this._name.value;
     const descrp = this._descrp.value;
@@ -374,23 +424,29 @@ class DashboardConfig extends Component<any, DashboardConfigState> {
     return <React.Fragment>{dashsTs}</React.Fragment>;
   };
   connectTrello = () => {
-    const self = this
     userApi
       .connectTrello(this._token, this.props.user)
       .then((data: any) => {
         console.log(data);
         this.props.startApprove();
-        try{
-          let w = window.open(data.link, "_blank");
-          if(w!==null){
-            w.addEventListener("beforeunload", function(e){
-              console.log("fire the close process")
-              self.props.endApproveAccount();
-            }, false);
+        //self.props.endApproveAccount();
+        let _user = JSON.parse(localStorage.getItem("user") || "");
+        _user.token = this._token;
+        window.open(data.link, "_blank");
+        let inter = setInterval(() => {
+          // if endApprovingAction fired -> update the current user -> set approvingaction & end approvingAction to false / null
+          let endFired = localStorage.getItem("endApprovingAction");
+          console.log("still watching");
+          if (endFired && endFired === "true") {
+            console.log("it's over let's update our state here");
+            clearInterval(inter);
+            /**
+             * update user in state -> reset approving
+             */
+            userActions.approveActionReset();
+            this.props.userActions.loadUser(_user);
           }
-        }catch(err){
-          console.log(err)
-        }
+        }, 5000);
       })
       .catch((error: any) => {
         console.log(error);
@@ -480,11 +536,96 @@ class DashboardConfig extends Component<any, DashboardConfigState> {
                     {this.props.user.accounts &&
                     this.props.user.accounts.trello &&
                     this.props.user.accounts.trello.token.length !== 0 ? (
-                      <div>Load your dashboards by selecting em</div>
+                      <Box direction="column">
+                        <Text margin="medium">
+                          Start by selecting the boards that you want to use
+                        </Text>
+                        {Object.keys(this.props.user.accounts).map(
+                          (account: any) => {
+                            let cnt: any = this.props.user.accounts[account];
+                            return (
+                              <ExpansionPanel key={account}>
+                                <ExpansionPanelSummary
+                                  expandIcon={<ExpandMoreIcon />}>
+                                  <Typography>{cnt.accountType}</Typography>
+                                </ExpansionPanelSummary>
+                                <ExpansionPanelDetails>
+                                  <Box direction="column" fill>
+                                    <Typography>
+                                      Connected account {cnt.accountType} as
+                                      {this._userAccountsBoards[
+                                        cnt.accountType
+                                      ] != undefined &&
+                                        this._userAccountsBoards[
+                                          cnt.accountType
+                                        ]["user"] != undefined && (
+                                          <a
+                                            href={
+                                              this._userAccountsBoards[
+                                                cnt.accountType
+                                              ]["user"].url
+                                            }
+                                            target="_blank">
+                                            {
+                                              this._userAccountsBoards[
+                                                cnt.accountType
+                                              ]["user"].fullName
+                                            }
+                                          </a>
+                                        )}
+                                      .
+                                    </Typography>
+                                    <Box
+                                      margin="small"
+                                      background="light-0"
+                                      fill>
+                                      {this._userAccountsBoards &&
+                                        this._userAccountsBoards[
+                                          cnt.accountType
+                                        ] != undefined &&
+                                        this._userAccountsBoards[
+                                          cnt.accountType
+                                        ]["boards"] != undefined && (
+                                          <List>
+                                            {Object.keys(
+                                              this._userAccountsBoards[
+                                                cnt.accountType
+                                              ]["boards"]
+                                            ).map(boardNM => {
+                                              const board = this
+                                                ._userAccountsBoards[
+                                                cnt.accountType
+                                              ]["boards"][boardNM];
+                                              return (
+                                                <ListItem key={board.id}>
+                                                  <ListItemIcon>
+                                                    <Connect />
+                                                  </ListItemIcon>
+                                                  <ListItemText
+                                                    primary={board.name}
+                                                    secondary={board.desc}
+                                                  />
+
+                                                  <ListItemSecondaryAction>
+                                                    <Switch />
+                                                  </ListItemSecondaryAction>
+                                                </ListItem>
+                                              );
+                                            })}
+                                          </List>
+                                        )}
+                                    </Box>
+                                  </Box>
+                                </ExpansionPanelDetails>
+                              </ExpansionPanel>
+                            );
+                          }
+                        )}
+                      </Box>
                     ) : (
                       <Box direction="column" justify="around" pad="medium">
                         <Paragraph>
-                          Welcome in uBoos , before you start boosing, we first
+                          Welcome in uBoss , before you start Bossing, we first
                           need you to connect to your trello account by clicking
                           on the button below. a popup will be shown from trello
                           asking you to coonect and approve the connection ,
@@ -528,7 +669,9 @@ const mapDispatchToProps = (dispatch: any) => {
     closeConfig: () => dispatch(closeDashboardConfig()),
     actions: bindActionCreators(dashboardsActions, dispatch),
     startApprove: () => dispatch(startApproveAccount()),
-    endApproveAccount: () => dispatch(endApproveAccount())
+    endApproveAccount: () => dispatch(endApproveAccount()),
+    userActions: bindActionCreators(userActions, dispatch)
+    //resetApprovAction:()=>dispatch(approveActionReset())
   };
 };
 export default connect(

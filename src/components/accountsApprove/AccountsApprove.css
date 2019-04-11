@@ -22,11 +22,13 @@
 }
 
 .success {
-    background: hsl(357, 80%, 58%);
+    background: #3ac680 !important;
+    color: white;
 }
 
 .error {
-    background: #3ac680;
+    background: hsl(357, 80%, 58%) !important;
+    color: white;
 }
 
 @-webkit-keyframes AnimationName {

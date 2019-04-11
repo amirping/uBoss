@@ -22,6 +22,9 @@ export default {
     approvingAction: JSON.parse(
       localStorage.getItem("approvingAction") || "null"
     ),
+    endApprovingAction: JSON.parse(
+      localStorage.getItem("endApprovingAction") || "null"
+    ),
     user: JSON.parse(localStorage.getItem("user") || "null")
   },
   system: { success: null, error: null }

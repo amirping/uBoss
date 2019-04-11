@@ -1,0 +1,7 @@
+.success {
+    background: hsl(357, 80%, 58%);
+}
+
+.error {
+    background: #3ac680;
+}

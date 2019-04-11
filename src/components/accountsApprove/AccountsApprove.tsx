@@ -44,18 +44,18 @@ class AccountsApprove extends Component<any, AccountsApproveState> {
     }, 5000);
   }
   componentDidUpdate() {
-    if (!this.props.approvingAction) {
+    //close once the endAction fired
+    if (this.props.endApprovingAction === true) {
       setTimeout(() => {
         this.handleClose();
       }, 10000);
     }
+    console.log("updated ->");
   }
   handleClose = () => {
     window.close();
   };
   render() {
-    const suc = this.props.success && this.props.success.id === "AAPROVE";
-    const err = this.props.error && this.props.error.id === "AAPROVE";
     return (
       <Box
         fill
@@ -71,15 +71,12 @@ class AccountsApprove extends Component<any, AccountsApproveState> {
           pad="small">
           <Box id="info-box" direction="column">
             <Box direction="row" align="center" gap="10px" className="titling">
-              <span>uBoos</span>
-
+              <span>uBoss</span>
               <Add size="large" color="plain" />
-
               <span>{this.props.match.params.accountType}</span>
             </Box>
             {this.props.approvingAction === true &&
-              !(this.props.success && this.props.success.id === "AAPROVE") &&
-              !(this.props.error && this.props.error.id === "APPROVE") && (
+              !this.props.endApprovingAction && (
                 <Card>
                   <CardContent>
                     <Box direction="row-responsive" gap="10px">
@@ -102,8 +99,8 @@ class AccountsApprove extends Component<any, AccountsApproveState> {
                   <Box>
                     <Text>
                       Cheers ☺️ . Your {this.props.match.params.accountType}{" "}
-                      account has ben linked with uBoos. This window will be
-                      closed afetr few seconds insted you can closed.
+                      account has ben linked with uBoss. This window will be
+                      closed after few seconds insted you can closed.
                     </Text>
                   </Box>
                 </CardContent>
@@ -140,15 +137,16 @@ const mapStateToProps = (state: any) => {
     user: state.auth.user,
     success: state.auth.success,
     error: state.auth.error,
-    approvingAction: state.auth.approvingAction
+    approvingAction: state.auth.approvingAction,
+    endApprovingAction: state.auth.endApprovingAction
   };
 };
 
 const mapDispatchToProps = (dispatch: any) => {
   return {
     approveAccount: (user: string, token: string) =>
-      dispatch(approveAccount(user, token)),
-    endApproveAccount: () => dispatch(endApproveAccount())
+      dispatch(approveAccount(user, token))
+    //endApproveAccount: () => dispatch(endApproveAccount())
   };
 };
 

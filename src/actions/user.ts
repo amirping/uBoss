@@ -127,7 +127,9 @@ export function startApproveAccount() {
   return { type: Types.APPROVE_ACCOUNT };
 }
 export function endApproveAccount() {
-  localStorage.removeItem("approvingAction");
+  // version 2 of approving getting place baby -- this fn is OFF
+  //localStorage.removeItem("approvingAction");
+  localStorage.setItem("endApprovingAction", "true");
   return { type: Types.APPROVE_ACCOUNT_END };
 }
 export function approveAccount(user: any, token: string) {
@@ -176,9 +178,23 @@ export function approveAccount(user: any, token: string) {
   };
 }
 export function approveAccountSucces() {
+  //return function(dispatch:any){
+  //dispatch(endApproveAccount()) // version 2 of approving getting place baby
+  localStorage.setItem("endApprovingAction", "true");
   return { type: Types.APPROVE_ACCOUNT_SUCCESS };
+  //}
+}
+export function approveAccountError(error: any) {
+  //return function(dispatch:any){
+  //dispatch(endApproveAccount()) // version 2 of approving getting place baby
+  localStorage.setItem("endApprovingAction", "true");
+  return { type: Types.APPROVE_ACCOUNT_ERROR, error: error };
+  //}
 }
 
-export function approveAccountError(error: any) {
-  return { type: Types.APPROVE_ACCOUNT_ERROR, error: error };
+export function approveActionReset() {
+  console.log("fire approveActionReset");
+  localStorage.removeItem("approvingAction");
+  localStorage.removeItem("endApprovingAction");
+  return { type: Types.APPROVE_ACTION_RESET };
 }

@@ -4,6 +4,7 @@ import Dashboard from "../dashboard/Dashboard";
 import Dashboards from "../dashboards/Dashboards";
 import AppBar from "../appBar/appBar";
 import { connect } from "react-redux";
+import { loadUser } from "../../actions/user";
 
 export interface InAppProps {}
 
@@ -12,7 +13,13 @@ export interface InAppState {}
 class InApp extends Component<any, InAppState> {
   constructor(props: InAppProps) {
     super(props);
-    this.state = { connected: false, user: {} };
+    this.state = { connected: false, user: {} }; // to be removed
+  }
+  componentDidMount() {
+    let user = JSON.parse(localStorage.getItem("user") || "null");
+    const _token = localStorage.getItem("token");
+    user.token = _token;
+    this.props.loadUser(user);
   }
   render() {
     return (
@@ -40,7 +47,11 @@ const mapStateToProps = (state: any) => {
   };
 };
 
-const mapDispatchToProps = {};
+const mapDispatchToProps = (dispatch: any) => {
+  return {
+    loadUser: (user: any) => dispatch(loadUser(user))
+  };
+};
 
 export default connect(
   mapStateToProps,

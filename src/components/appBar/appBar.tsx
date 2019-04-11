@@ -40,7 +40,7 @@ class AppBar extends Component<any, AppBarState> {
                 </IconButton>
               )}
               <Text size="large" weight={500} alignSelf="center">
-                uBoos
+                uBoss
               </Text>
             </Box>
             <Box>
