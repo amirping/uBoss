@@ -26,7 +26,7 @@ import {
   Switch,
   ListItemIcon
 } from "@material-ui/core";
-import { Connect } from "grommet-icons";
+import { Connect, Connectivity } from "grommet-icons";
 import { shortName } from "../../utils";
 import uuidv1 from "uuid";
 import { Box, Tabs, Tab, Form, Text, Paragraph } from "grommet";
@@ -38,6 +38,7 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import * as dashboardsActions from "../../actions/dashboards";
 import * as userActions from "../../actions/user";
+import * as importedDashboardsActions from "../../actions/importedDashboards";
 import { openDashboardConfig, closeDashboardConfig } from "../../actions/view";
 import userApi from "../../api/userApi";
 import "./DashboardConfig.css";
@@ -140,8 +141,6 @@ class DashboardConfig extends Component<any, DashboardConfigState> {
     this._token = localStorage.getItem("token");
     this._listsForUpdate = Object.keys(this.props.dashboard_data.lists);
     this._newListsForUpdate = this.props.dashboard_data.lists;
-    // if user have connected accounts -> load all bards possible
-    // console.log(this.props.user.accounts);
     if (
       this.props.user.accounts &&
       Object.keys(this.props.user.accounts).length > 0
@@ -175,7 +174,6 @@ class DashboardConfig extends Component<any, DashboardConfigState> {
               });
             break;
           }
-
           default:
             console.log("some accounts are not supported right now");
             break;
@@ -183,6 +181,44 @@ class DashboardConfig extends Component<any, DashboardConfigState> {
       });
     }
   }
+
+  handleCreateImportedDashboard = (
+    id_remoteBoard: string,
+    accountType: string
+  ) => {
+    console.log("Create an ImportedBoard with remote_id === ", id_remoteBoard);
+    this.props.importedDashboardsActions.createImportedDashboard(
+      this.props.selected_dashboard,
+      this._token,
+      { dashboard_from: accountType, remote_board_id: id_remoteBoard }
+    );
+  };
+  handleDeleteImportedDashboard = (id_remoteBoard: string) => {
+    console.log("Delete the ImportedBoard with remote_id === ", id_remoteBoard);
+    const id_importedBoard = this.props.dashboard_data.importedDashboards.filter(
+      (s: any) => s.remote_board_id === id_remoteBoard
+    )[0]._id;
+    this.props.importedDashboardsActions.deleteImportedDashboard(
+      id_importedBoard,
+      this._token,
+      this.props.selected_dashboard
+    );
+  };
+  handleImportedListSelection = (
+    id_remoteBoard: string,
+    accountType?: string
+  ) => (event: any) => {
+    if (event.target.checked) {
+      if (accountType) {
+        this.handleCreateImportedDashboard(id_remoteBoard, accountType);
+      } else {
+        throw Error("we need the account type dude");
+      }
+    } else {
+      this.handleDeleteImportedDashboard(id_remoteBoard);
+    }
+  };
+
   handleClose = () => {
     this.props.closeConfig();
   };
@@ -423,6 +459,133 @@ class DashboardConfig extends Component<any, DashboardConfigState> {
     );
     return <React.Fragment>{dashsTs}</React.Fragment>;
   };
+  /**
+   * @param remoteID - the id of the remote board
+   * @returns true is the remote board is loaded in the current dashboard , false else
+   */
+  isLoadedBoard = (remoteID: string) => {
+    return (
+      this.props.dashboard_data.importedDashboards.filter(
+        (s: any) => s.remote_board_id === remoteID
+      ).length != 0
+    );
+  };
+  DashboardsImporter = () => {
+    const haveAccounts =
+      this.props.user.accounts &&
+      Object.keys(this.props.user.accounts).length > 0;
+    if (haveAccounts) {
+      return (
+        <Box direction="column">
+          <Text margin="medium">
+            Start by selecting the boards that you want to use
+          </Text>
+          {Object.keys(this.props.user.accounts).map((account: any) => {
+            const cnt: any = this.props.user.accounts[account];
+            return (
+              <ExpansionPanel key={account}>
+                <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography>{cnt.accountType}</Typography>
+                </ExpansionPanelSummary>
+                <ExpansionPanelDetails>
+                  <Box direction="column" fill>
+                    <Typography>
+                      Connected account {cnt.accountType} as
+                      {this._userAccountsBoards[cnt.accountType] != undefined &&
+                        this._userAccountsBoards[cnt.accountType]["user"] !=
+                          undefined && (
+                          <a
+                            href={
+                              this._userAccountsBoards[cnt.accountType]["user"]
+                                .url
+                            }
+                            target="_blank">
+                            {
+                              this._userAccountsBoards[cnt.accountType]["user"]
+                                .fullName
+                            }
+                          </a>
+                        )}
+                      .
+                    </Typography>
+                    <Box margin="small" background="light-0" fill>
+                      {this._userAccountsBoards &&
+                        this._userAccountsBoards[cnt.accountType] !=
+                          undefined &&
+                        this._userAccountsBoards[cnt.accountType]["boards"] !=
+                          undefined && (
+                          <List>
+                            {Object.keys(
+                              this._userAccountsBoards[cnt.accountType][
+                                "boards"
+                              ]
+                            ).map(boardNM => {
+                              const board = this._userAccountsBoards[
+                                cnt.accountType
+                              ]["boards"][boardNM];
+                              return (
+                                <ListItem key={board.id}>
+                                  <ListItemIcon>
+                                    {!this.isLoadedBoard(board.id) ? (
+                                      <Connect />
+                                    ) : (
+                                      <Connectivity />
+                                    )}
+                                  </ListItemIcon>
+                                  <ListItemText
+                                    primary={board.name}
+                                    secondary={board.desc}
+                                  />
+
+                                  <ListItemSecondaryAction>
+                                    <Switch
+                                      checked={this.isLoadedBoard(board.id)}
+                                      onChange={this.handleImportedListSelection(
+                                        board.id,
+                                        cnt.accountType
+                                      )}
+                                    />
+                                  </ListItemSecondaryAction>
+                                </ListItem>
+                              );
+                            })}
+                          </List>
+                        )}
+                    </Box>
+                  </Box>
+                </ExpansionPanelDetails>
+              </ExpansionPanel>
+            );
+          })}
+        </Box>
+      );
+    } else {
+      return (
+        <Box direction="column" justify="around" pad="medium">
+          <Paragraph>
+            Welcome in uBoss , before you start Bossing, we first need you to
+            connect to your trello account by clicking on the button below. a
+            popup will be shown from trello asking you to coonect and approve
+            the connection , validates and we will take care of the other things
+          </Paragraph>
+          <Box direction="row">
+            <Button
+              variant="outlined"
+              onClick={this.connectTrello}
+              color="primary">
+              Connect trello
+            </Button>
+            <Button variant="outlined" color="primary">
+              Connect Git
+            </Button>
+            <Button variant="outlined" color="primary">
+              Connect Jira
+            </Button>
+          </Box>
+        </Box>
+      );
+    }
+  };
   connectTrello = () => {
     userApi
       .connectTrello(this._token, this.props.user)
@@ -533,112 +696,7 @@ class DashboardConfig extends Component<any, DashboardConfigState> {
                 </Tab>
                 <Tab title="Load Dashboards" color="black">
                   <Box pad="small" flex>
-                    {this.props.user.accounts &&
-                    this.props.user.accounts.trello &&
-                    this.props.user.accounts.trello.token.length !== 0 ? (
-                      <Box direction="column">
-                        <Text margin="medium">
-                          Start by selecting the boards that you want to use
-                        </Text>
-                        {Object.keys(this.props.user.accounts).map(
-                          (account: any) => {
-                            let cnt: any = this.props.user.accounts[account];
-                            return (
-                              <ExpansionPanel key={account}>
-                                <ExpansionPanelSummary
-                                  expandIcon={<ExpandMoreIcon />}>
-                                  <Typography>{cnt.accountType}</Typography>
-                                </ExpansionPanelSummary>
-                                <ExpansionPanelDetails>
-                                  <Box direction="column" fill>
-                                    <Typography>
-                                      Connected account {cnt.accountType} as
-                                      {this._userAccountsBoards[
-                                        cnt.accountType
-                                      ] != undefined &&
-                                        this._userAccountsBoards[
-                                          cnt.accountType
-                                        ]["user"] != undefined && (
-                                          <a
-                                            href={
-                                              this._userAccountsBoards[
-                                                cnt.accountType
-                                              ]["user"].url
-                                            }
-                                            target="_blank">
-                                            {
-                                              this._userAccountsBoards[
-                                                cnt.accountType
-                                              ]["user"].fullName
-                                            }
-                                          </a>
-                                        )}
-                                      .
-                                    </Typography>
-                                    <Box
-                                      margin="small"
-                                      background="light-0"
-                                      fill>
-                                      {this._userAccountsBoards &&
-                                        this._userAccountsBoards[
-                                          cnt.accountType
-                                        ] != undefined &&
-                                        this._userAccountsBoards[
-                                          cnt.accountType
-                                        ]["boards"] != undefined && (
-                                          <List>
-                                            {Object.keys(
-                                              this._userAccountsBoards[
-                                                cnt.accountType
-                                              ]["boards"]
-                                            ).map(boardNM => {
-                                              const board = this
-                                                ._userAccountsBoards[
-                                                cnt.accountType
-                                              ]["boards"][boardNM];
-                                              return (
-                                                <ListItem key={board.id}>
-                                                  <ListItemIcon>
-                                                    <Connect />
-                                                  </ListItemIcon>
-                                                  <ListItemText
-                                                    primary={board.name}
-                                                    secondary={board.desc}
-                                                  />
-
-                                                  <ListItemSecondaryAction>
-                                                    <Switch />
-                                                  </ListItemSecondaryAction>
-                                                </ListItem>
-                                              );
-                                            })}
-                                          </List>
-                                        )}
-                                    </Box>
-                                  </Box>
-                                </ExpansionPanelDetails>
-                              </ExpansionPanel>
-                            );
-                          }
-                        )}
-                      </Box>
-                    ) : (
-                      <Box direction="column" justify="around" pad="medium">
-                        <Paragraph>
-                          Welcome in uBoss , before you start Bossing, we first
-                          need you to connect to your trello account by clicking
-                          on the button below. a popup will be shown from trello
-                          asking you to coonect and approve the connection ,
-                          validates and we will take care of the other things
-                        </Paragraph>
-                        <Button
-                          variant="outlined"
-                          onClick={this.connectTrello}
-                          color="primary">
-                          Connect trello
-                        </Button>
-                      </Box>
-                    )}
+                    <this.DashboardsImporter />
                   </Box>
                 </Tab>
               </Tabs>
@@ -670,7 +728,11 @@ const mapDispatchToProps = (dispatch: any) => {
     actions: bindActionCreators(dashboardsActions, dispatch),
     startApprove: () => dispatch(startApproveAccount()),
     endApproveAccount: () => dispatch(endApproveAccount()),
-    userActions: bindActionCreators(userActions, dispatch)
+    userActions: bindActionCreators(userActions, dispatch),
+    importedDashboardsActions: bindActionCreators(
+      importedDashboardsActions,
+      dispatch
+    )
     //resetApprovAction:()=>dispatch(approveActionReset())
   };
 };

@@ -92,5 +92,17 @@ export default function dashboards(state: any = dashboardsState, action: any) {
       selectedDashboardData: state.selectedDashboardData // keep the same -> not sure
     });
   }
+  if (action.type === Types.CREATE_IMPORTED_DASHBOARD_SUCCESS) {
+    return Object.assign({}, state, {
+      error: null,
+      success: action.payload
+    });
+  }
+  if (action.type === Types.CREATE_IMPORTED_DASHBOARD_ERROR) {
+    return Object.assign({}, state, {
+      success: null,
+      error: action.error
+    });
+  }
   return state;
 }
