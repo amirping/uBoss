@@ -4,6 +4,7 @@ import { closeDashboardCreator } from "./view";
 import ImportedDashboardApi from "../api/importedDashboardApi";
 import { types } from "util";
 import { loadDashboard } from "./dashboards";
+import trelloApi from "../api/trelloApi";
 export function createImportedDashboard(
   dashboardID: string,
   token: string,
@@ -63,6 +64,7 @@ export function deleteImportedDashboard(
       });
   };
 }
+
 export function createImportedDashboardSuccess() {
   return { type: Types.CREATE_IMPORTED_DASHBOARD_SUCCESS };
 }

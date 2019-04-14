@@ -44,6 +44,7 @@ import userApi from "../../api/userApi";
 import "./DashboardConfig.css";
 import { startApproveAccount, endApproveAccount } from "../../actions/user";
 import TrelloApi from "../../api/trelloApi";
+import importedDashboardApi from "../../api/importedDashboardApi";
 export interface DashboardConfigProps {}
 
 export interface DashboardConfigState {
@@ -60,6 +61,7 @@ class DashboardConfig extends Component<any, DashboardConfigState> {
   _token: any;
   _newListsForUpdate: any;
   _userAccountsBoards: any = {};
+  _importeddashboardsRemoteData: any[] = [];
   constructor(props: any) {
     super(props);
     this.state = {
@@ -150,6 +152,7 @@ class DashboardConfig extends Component<any, DashboardConfigState> {
       allAccounts.map((account: any) => {
         const accountD = this.props.user.accounts[account];
         this._userAccountsBoards[accountD.accountType] = {};
+        this.getAllBoardRemoteData();
         switch (accountD.accountType) {
           case "trello": {
             console.log("trello start loading");
@@ -167,6 +170,7 @@ class DashboardConfig extends Component<any, DashboardConfigState> {
                 this._userAccountsBoards[accountD.accountType][
                   "boards"
                 ] = response;
+                console.log(this._userAccountsBoards);
               })
               .catch(error => {
                 console.log(error);
@@ -180,6 +184,26 @@ class DashboardConfig extends Component<any, DashboardConfigState> {
         }
       });
     }
+  }
+
+  getAllBoardRemoteData() {
+    this.props.dashboard_data.importedDashboards.map((dash: any) => {
+      const client_token = this.props.user.accounts[dash.dashboard_from].token;
+      importedDashboardApi
+        .getRemoteBoardData(
+          dash.remote_board_id,
+          dash.dashboard_from,
+          client_token
+        )
+        .then(response => {
+          if (response && response.id) {
+            this._importeddashboardsRemoteData.push(response);
+          }
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    });
   }
 
   handleCreateImportedDashboard = (
@@ -363,98 +387,113 @@ class DashboardConfig extends Component<any, DashboardConfigState> {
     return <React.Fragment>{options}</React.Fragment>;
   };
   DashboardsTransformer = () => {
-    const dashsTs = this.state.dashboardData.loaded_dashboards.dashboardsIds.map(
-      (id: any) => {
-        const dash = this.state.dashboardData.loaded_dashboards.dashboards[id];
-        return (
-          <ExpansionPanel key={id}>
-            <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography>{dash.title}</Typography>
-            </ExpansionPanelSummary>
-            <ExpansionPanelDetails>
-              <Box direction="column" gap="small" fill>
-                <Typography>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                  Suspendisse malesuada lacus ex, sit amet blandit leo lobortis
-                  eget.
-                </Typography>
-                {dash.listsIds.map((listID: any) => {
-                  const list = dash.loaded_lists[listID];
-                  return (
-                    <React.Fragment key={listID}>
-                      <Box
-                        pad="xsmall"
-                        gap="small"
-                        direction="row-responsive"
-                        fill="horizontal">
-                        <Box direction="column" justify="center">
-                          <Typography variant="subheading">
-                            Load cards From
-                          </Typography>
-                        </Box>
-                        <Box flex>
-                          <TextField
-                            variant="outlined"
-                            disabled={true}
-                            value={list.name}
-                            label="list to load from"
-                          />
-                        </Box>
-                        <Box direction="column" justify="center">
-                          <Typography variant="subheading">
-                            Into the list ➡
-                          </Typography>
-                        </Box>
-                        <Box flex>
-                          <Select
-                            onChange={event =>
-                              this.handleChangeTransform(event, listID, dash.id)
-                            }
-                            inputProps={{
-                              id: list.id
-                            }}
-                            input={
-                              <OutlinedInput
-                                name="Load into"
-                                id="jkjsdkjfnsdkjnf"
-                                labelWidth={150}
-                                inputProps={{
-                                  id: listID
-                                }}
-                              />
-                            }
-                            value={list.transformTo || ""}>
-                            <MenuItem value="">
-                              <em>None</em>
-                            </MenuItem>
-                            {Object.keys(this.props.dashboard_data.lists).map(
-                              (liID: any) => {
-                                const li = this.props.dashboard_data.lists[
-                                  liID
-                                ];
-                                return (
-                                  <MenuItem key={li.id} value={li.id}>
-                                    {li.name}
-                                  </MenuItem>
-                                );
+    const dashsTs = this.props.dashboard_data.importedDashboards.map(
+      (dash: any) => {
+        const dash_remote_data = this._importeddashboardsRemoteData.filter(
+          e => e.id === dash.remote_board_id
+        )[0];
+        console.log(dash_remote_data);
+        if (dash_remote_data !== undefined && dash_remote_data != false) {
+          return (
+            <ExpansionPanel key={dash._id}>
+              <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography>{dash_remote_data.name}</Typography>
+              </ExpansionPanelSummary>
+              <ExpansionPanelDetails>
+                <Box direction="column" gap="small" fill>
+                  <Typography>
+                    Set-up your mapping method, the first column belong to the
+                    remote board and the seconde one it's where you want the
+                    cards to show up in the current dashboard.
+                  </Typography>
+                  {dash_remote_data.lists.map((list: any) => {
+                    //const list = dash.loaded_lists[list];
+                    return (
+                      <React.Fragment key={list.id}>
+                        <Box
+                          pad="xsmall"
+                          gap="small"
+                          direction="row-responsive"
+                          fill="horizontal">
+                          <Box direction="column" justify="center">
+                            <Typography variant="subheading">
+                              Load cards From
+                            </Typography>
+                          </Box>
+                          <Box flex>
+                            <TextField
+                              variant="outlined"
+                              disabled={true}
+                              value={list.name}
+                              label="list to load from"
+                            />
+                          </Box>
+                          <Box direction="column" justify="center">
+                            <Typography variant="subheading">
+                              Into the list ➡
+                            </Typography>
+                          </Box>
+                          <Box flex>
+                            <Select
+                              onChange={event =>
+                                this.handleChangeTransform(
+                                  event,
+                                  list.id,
+                                  dash._id
+                                )
                               }
-                            )}
-                          </Select>
+                              inputProps={{
+                                id: list.id
+                              }}
+                              input={
+                                <OutlinedInput
+                                  name="Load into"
+                                  id="jkjsdkjfnsdkjnf"
+                                  labelWidth={150}
+                                  inputProps={{
+                                    id: list.id
+                                  }}
+                                />
+                              }
+                              value={list.transformTo || ""}>
+                              <MenuItem value="">
+                                <em>None</em>
+                              </MenuItem>
+                              {Object.keys(this.props.dashboard_data.lists).map(
+                                (liID: any) => {
+                                  const li = this.props.dashboard_data.lists[
+                                    liID
+                                  ];
+                                  return (
+                                    <MenuItem key={li.id} value={li.id}>
+                                      {li.name}
+                                    </MenuItem>
+                                  );
+                                }
+                              )}
+                            </Select>
+                          </Box>
                         </Box>
-                      </Box>
-                      <Divider />
-                    </React.Fragment>
-                  );
-                })}
-              </Box>
-            </ExpansionPanelDetails>
-            <ExpansionPanelActions>
-              <Button variant="contained" color="primary">
-                Save transformt
-              </Button>
-            </ExpansionPanelActions>
-          </ExpansionPanel>
-        );
+                        <Divider />
+                      </React.Fragment>
+                    );
+                  })}
+                </Box>
+              </ExpansionPanelDetails>
+              <ExpansionPanelActions>
+                <Button variant="contained" color="primary">
+                  Save transformt
+                </Button>
+              </ExpansionPanelActions>
+            </ExpansionPanel>
+          );
+        } else {
+          return (
+            <Box key={dash._id} round="15" pad="medium" elevation="small">
+              Cannot proccess this dashborad right now
+            </Box>
+          );
+        }
       }
     );
     return <React.Fragment>{dashsTs}</React.Fragment>;

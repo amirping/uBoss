@@ -1,6 +1,7 @@
 /**
  * class of all possible API on the imported Dashboard
  */
+import trelloApi from "./trelloApi";
 export default class ImportedDashboardApi {
   static API_URL = "http://127.0.0.1:3333/api/ImportedDashboards";
   static API_Header = new Headers({ "Content-Type": "application/json" });
@@ -123,5 +124,42 @@ export default class ImportedDashboardApi {
       .catch(error => {
         return error;
       });
+  }
+
+  /**
+   *
+   * @param remoteBoardID the id of the reamote board
+   * @param remoteBoardType the board type "trello , git etc..."
+   * @param remote_token the token in the remote plateform
+   */
+
+  static getRemoteBoardData(
+    remoteBoardID: string,
+    remoteBoardType: string,
+    remote_token: string
+  ) {
+    switch (remoteBoardType) {
+      case "trello": {
+        return trelloApi
+          .getBoard(remote_token, remoteBoardID)
+          .then(response => {
+            if (String(response.id) === String(remoteBoardID)) {
+              return response;
+            } else {
+              return false;
+            }
+          })
+          .catch(error => {
+            //alert("we have a network problem homiiee");
+            console.log(error);
+            return false;
+          });
+      }
+      default: {
+        console.log("error -> not supported");
+        throw "Remote Board Not Supported";
+        //throw Error("the following Board is not supported right now!!");
+      }
+    }
   }
 }

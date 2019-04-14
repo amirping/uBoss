@@ -29,6 +29,24 @@ export default class TrelloApi {
         return error;
       });
   }
+  static getBoard(user_token: string, boardID: string) {
+    let api_url =
+      this.URL +
+      "boards/" +
+      boardID +
+      "?key=" +
+      this.APP_KEY +
+      "&lists=open&token=" +
+      user_token;
+    const request = new Request(api_url, {});
+    return fetch(request)
+      .then(response => {
+        return response.json();
+      })
+      .catch(error => {
+        return error;
+      });
+  }
   static moveCard(
     user_token: string,
     board_id: string,
