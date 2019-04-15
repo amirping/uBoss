@@ -65,6 +65,44 @@ export function deleteImportedDashboard(
   };
 }
 
+export function updateImporteddashboard(
+  importedDashboardID: string,
+  token: string,
+  dashboardID: string,
+  importedDashboardData: any
+) {
+  return function(dispatch: any) {
+    return ImportedDashboardApi.updateImportedDashboard(
+      token,
+      importedDashboardID,
+      importedDashboardData
+    )
+      .then(response => {
+        if (response.status === 202) {
+          dispatch(updateImportedDashboardSuccess());
+          dispatch(loadDashboard(dashboardID, token));
+        } else {
+          dispatch(
+            updateImportedDashboardError({
+              code: response.status,
+              message: response.message
+            })
+          );
+        }
+      })
+      .catch(error => {
+        dispatch(netError(error));
+      });
+  };
+}
+
+export function updateImportedDashboardSuccess() {
+  return { type: Types.UPDATE_IMPORTED_DASHBOARD_SUCCESS };
+}
+export function updateImportedDashboardError(payload: any) {
+  return { type: Types.UPDATE_IMPORTED_DASHBOARD_ERROR, error: payload };
+}
+
 export function createImportedDashboardSuccess() {
   return { type: Types.CREATE_IMPORTED_DASHBOARD_SUCCESS };
 }

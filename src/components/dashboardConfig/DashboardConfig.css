@@ -1,7 +1,11 @@
 .success {
-    background: hsl(357, 80%, 58%);
+    background: #3ac680;
 }
 
 .error {
-    background: #3ac680;
+    background: hsl(357, 80%, 58%);
+}
+
+.dontLoad {
+    color: hsl(4, 55%, 50%);
 }

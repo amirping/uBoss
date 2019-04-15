@@ -26,7 +26,7 @@ import {
   Switch,
   ListItemIcon
 } from "@material-ui/core";
-import { Connect, Connectivity } from "grommet-icons";
+import { Connect, Connectivity, Unlink } from "grommet-icons";
 import { shortName } from "../../utils";
 import uuidv1 from "uuid";
 import { Box, Tabs, Tab, Form, Text, Paragraph } from "grommet";
@@ -64,79 +64,6 @@ class DashboardConfig extends Component<any, DashboardConfigState> {
   _importeddashboardsRemoteData: any[] = [];
   constructor(props: any) {
     super(props);
-    this.state = {
-      show: false,
-      listAdder: "",
-      dashboardData: {
-        listsIds: ["dl-1", "dl-2"],
-        lists: {
-          "dl-1": {
-            title: "Done",
-            id: "dl-1"
-          },
-          "dl-2": {
-            title: "Progress",
-            id: "dl-2"
-          }
-        },
-        loaded_dashboards: {
-          dashboardsIds: ["d-14", "d-15", "d-16"],
-          dashboards: {
-            "d-14": {
-              id: "d-14",
-              listsIds: ["l-114", "l-555"],
-              title: "Dashboard jsProject",
-              loaded_lists: {
-                "l-114": {
-                  id: "l-144",
-                  name: "ready",
-                  transformTo: ""
-                },
-                "l-555": {
-                  id: "l-555",
-                  name: "to be done",
-                  transformTo: ""
-                }
-              }
-            },
-            "d-15": {
-              id: "d-15",
-              listsIds: ["l-21234"],
-              title: "Dashboard javaProject",
-              loaded_lists: {
-                "l-21234": {
-                  name: "finish",
-                  id: "l-21234",
-                  transformTo: ""
-                }
-              }
-            },
-            "d-16": {
-              id: "d-16",
-              listsIds: ["l-88", "l-9775", "l-6654"],
-              title: "Dashboard cProject",
-              loaded_lists: {
-                "l-88": {
-                  name: "finished",
-                  id: "l-88",
-                  transformTo: ""
-                },
-                "l-9775": {
-                  name: "ready",
-                  id: "l-9775",
-                  transformTo: ""
-                },
-                "l-6654": {
-                  name: "close",
-                  id: "l-6654",
-                  transformTo: ""
-                }
-              }
-            }
-          }
-        }
-      }
-    };
   }
   componentDidMount() {
     console.log("mounted");
@@ -303,12 +230,44 @@ class DashboardConfig extends Component<any, DashboardConfigState> {
     delete obj.lists[listID];
     this.props.actions.updateDashboard(obj, this._token);
   };
-  handleChangeTransform = (event: any, sourceListId: any, dashboardId: any) => {
-    let newData = this.state.dashboardData;
-    newData.loaded_dashboards.dashboards[dashboardId].loaded_lists[
-      sourceListId
-    ].transformTo = event.target.value;
-    this.setState({ dashboardData: newData });
+  handleChangeTransform = (
+    event: any,
+    sourceListId: any,
+    ImportedDashboardId: any
+  ) => {
+    // let newData = this.state.dashboardData;
+    // newData.loaded_dashboards.dashboards[dashboardId].loaded_lists[
+    //   sourceListId
+    // ].transformTo = event.target.value;
+    // this.setState({ dashboardData: newData });
+    console.log(
+      "change we have => ",
+      sourceListId,
+      " in ",
+      ImportedDashboardId,
+      " -> ",
+      event.target.value
+    );
+    let importedDashboard = this.props.dashboard_data.importedDashboards.filter(
+      (d: any) => d._id === ImportedDashboardId
+    )[0];
+    let mappedLists: any;
+    if (importedDashboard.mappedLists) {
+      mappedLists = importedDashboard.mappedLists;
+    } else {
+      mappedLists = {};
+    }
+    mappedLists[sourceListId] = {
+      idlistRemote: sourceListId,
+      idlistLocal: event.target.value
+    };
+    console.log(mappedLists);
+    this.props.importedDashboardsActions.updateImporteddashboard(
+      ImportedDashboardId,
+      this._token,
+      importedDashboard.dashboard_id,
+      { mappedLists: mappedLists }
+    );
   };
 
   AddField = () => {
@@ -408,6 +367,14 @@ class DashboardConfig extends Component<any, DashboardConfigState> {
                   </Typography>
                   {dash_remote_data.lists.map((list: any) => {
                     //const list = dash.loaded_lists[list];
+                    var current_mapped_to = 0;
+                    if (
+                      dash.mappedLists &&
+                      dash.mappedLists[list.id] &&
+                      dash.mappedLists[list.id].idlistLocal
+                    ) {
+                      current_mapped_to = dash.mappedLists[list.id].idlistLocal;
+                    }
                     return (
                       <React.Fragment key={list.id}>
                         <Box
@@ -448,16 +415,21 @@ class DashboardConfig extends Component<any, DashboardConfigState> {
                               input={
                                 <OutlinedInput
                                   name="Load into"
-                                  id="jkjsdkjfnsdkjnf"
                                   labelWidth={150}
                                   inputProps={{
                                     id: list.id
                                   }}
                                 />
                               }
-                              value={list.transformTo || ""}>
-                              <MenuItem value="">
-                                <em>None</em>
+                              // value={
+                              //   dash.mappedLists[list.id].idlistLocal || ""
+                              // }
+                              value={current_mapped_to}>
+                              <MenuItem value="0">
+                                <em className="dontLoad">
+                                  <Unlink />
+                                  Don't load from this list
+                                </em>
                               </MenuItem>
                               {Object.keys(this.props.dashboard_data.lists).map(
                                 (liID: any) => {
@@ -480,11 +452,11 @@ class DashboardConfig extends Component<any, DashboardConfigState> {
                   })}
                 </Box>
               </ExpansionPanelDetails>
-              <ExpansionPanelActions>
+              {/* <ExpansionPanelActions>
                 <Button variant="contained" color="primary">
                   Save transformt
                 </Button>
-              </ExpansionPanelActions>
+              </ExpansionPanelActions> */}
             </ExpansionPanel>
           );
         } else {
