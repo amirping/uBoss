@@ -29,7 +29,7 @@ class CardItem extends Component<CardItemProps, CardItemState> {
               </Text>
             </Box>
             <Text color="black" size="medium">
-              be nev lent
+              this.props.cardData.name
             </Text>
           </CardContent>
         </Card>
@@ -37,5 +37,4 @@ class CardItem extends Component<CardItemProps, CardItemState> {
     );
   }
 }
-
 export default CardItem;

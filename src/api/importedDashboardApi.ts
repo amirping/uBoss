@@ -162,4 +162,35 @@ export default class ImportedDashboardApi {
       }
     }
   }
+
+  /**
+   *
+   * @param remoteListID the id of the list
+   * @param remoteBoardType the board type trello , git etc ...
+   * @param remote_token the user secret token
+   */
+
+  static getCards(
+    remoteListID: string,
+    remoteBoardType: string,
+    remote_token: string
+  ) {
+    switch (remoteBoardType) {
+      case "trello": {
+        return trelloApi
+          .getCards(remote_token, remoteListID)
+          .then(response => {
+            return response;
+          })
+          .catch(error => {
+            console.log(error);
+            return false;
+          });
+      }
+      default: {
+        console.log("error -> not supported");
+        throw "Remote Board Not Supported";
+      }
+    }
+  }
 }

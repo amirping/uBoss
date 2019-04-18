@@ -61,4 +61,17 @@ export default class TrelloApi {
     list_id: string,
     data: any
   ) {}
+  static getCards(user_token: string, listID: string) {
+    const api_url = `${this.URL}lists/${listID}/cards?key=${
+      this.APP_KEY
+    }&token=${user_token}`;
+    const request = new Request(api_url, {});
+    return fetch(request)
+      .then(response => {
+        return response.json();
+      })
+      .catch(error => {
+        return error;
+      });
+  }
 }

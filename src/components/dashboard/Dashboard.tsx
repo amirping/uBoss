@@ -10,6 +10,7 @@ import DashboardConfig from "../dashboardConfig/DashboardConfig";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import * as dashboardsActions from "../../actions/dashboards";
+import ImportedDashboardApi from "../../api/importedDashboardApi";
 export interface DashboardProps {}
 
 export interface DashboardState {
@@ -17,24 +18,79 @@ export interface DashboardState {
 }
 
 class Dashboard extends Component<any, DashboardState> {
+  _cardsData: any = [];
   constructor(props: any) {
     super(props);
   }
-  listRender = () => {
-    return (
-      <Box
-        className="list-main"
-        direction="column"
-        border="all"
-        width="medium"
-        height="medium"
-        margin={{ top: "xsmall" }}
-        animation="fadeIn"
-        background="dark-3">
-        list here{" "}
-      </Box>
-    );
+  componentDidMount() {
+    console.log("mounted");
+  }
+  cardsLoader = () => {
+    if (this.props.dashboard_data != undefined && this.props.dashboard_data) {
+      Object.keys(this.props.dashboard_data.lists).map(key => {
+        this._cardsData[key] = {};
+      });
+      this.props.dashboard_data.importedDashboards.map((ImportedDash: any) => {
+        // goes here
+        const client_token = this.props.user.accounts[
+          ImportedDash.dashboard_from
+        ].token;
+        // console.log(ImportedDash);
+        // on item in mappedLists call request an push result to  _cardsData
+        const mappedListsKeys = Object.keys(ImportedDash.mappedLists);
+        mappedListsKeys.map(key => {
+          const remoteList = ImportedDash.mappedLists[key];
+          ImportedDashboardApi.getCards(
+            remoteList.idlistRemote,
+            ImportedDash.dashboard_from,
+            client_token
+          )
+            .then(result => {
+              if (result && result.length > 0) {
+                if (
+                  !this._cardsData[remoteList.idlistLocal][
+                    ImportedDash.remote_board_id
+                  ]
+                ) {
+                  this._cardsData[remoteList.idlistLocal][
+                    ImportedDash.remote_board_id
+                  ] = [];
+                }
+                this._cardsData[remoteList.idlistLocal][
+                  ImportedDash.remote_board_id
+                ] = this._cardsData[remoteList.idlistLocal][
+                  ImportedDash.remote_board_id
+                ].concat(result);
+                console.log(this._cardsData);
+              }
+            })
+            .catch(err => {
+              console.log(err);
+            });
+        });
+      });
+    }
   };
+  componentDidUpdate() {
+    // get cards from remote boards and send each card for her list display
+    // add socket here to notify whene we need to retrive data again
+    this.cardsLoader();
+  }
+  // listRender = () => {
+  //   return (
+  //     <Box
+  //       className="list-main"
+  //       direction="column"
+  //       border="all"
+  //       width="medium"
+  //       height="medium"
+  //       margin={{ top: "xsmall" }}
+  //       animation="fadeIn"
+  //       background="dark-3">
+  //       list here{" "}
+  //     </Box>
+  //   );
+  // };
   DashRender = () => {
     return (
       <Box direction="column" fill>
@@ -62,6 +118,7 @@ class Dashboard extends Component<any, DashboardState> {
             <ListItem
               key={listID}
               listData={this.props.dashboard_data.lists[listID]}
+              cards={this._cardsData[listID]}
             />
           ))}
         </Box>
@@ -124,7 +181,8 @@ const mapStateToProps = (state: any) => {
     success: state.dashboards.success,
     error: state.dashboards.error,
     selected_dashboard: state.dashboards.selectedDashboardID,
-    dashboard_data: state.dashboards.selectedDashboardData
+    dashboard_data: state.dashboards.selectedDashboardData,
+    user: state.auth.user
   };
 };
 

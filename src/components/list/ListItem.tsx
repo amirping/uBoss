@@ -13,6 +13,8 @@ export interface ListItemState {
 class ListItem extends Component<any, ListItemState> {
   constructor(props: any) {
     super(props);
+    console.log("inst List -> ", this.props.listData.id);
+    console.log("data for this list ", this.props.cards);
     this.state = {
       data: {
         tasks: {
@@ -65,6 +67,9 @@ class ListItem extends Component<any, ListItemState> {
       }
     };
   }
+  componentDidUpdate() {
+    console.log("list updates");
+  }
 
   render() {
     return (
@@ -85,9 +90,15 @@ class ListItem extends Component<any, ListItemState> {
           </IconButton>
         </Box>
         <Box direction="column" pad="xsmall">
-          {this.state.data.list.taskIds.map((taskId: any) => {
+          {/* {this.state.data.list.taskIds.map((taskId: any) => {
             const cardData = this.state.data.tasks[taskId];
             return <CardItem key={taskId} cardData={cardData} />;
+          })} */}
+          {Object.keys(this.props.cards).map((remoteId: any) => {
+            const remoteCards = this.props.cards[remoteId];
+            remoteCards.map((card: any) => {
+              return <CardItem key={card.id} cardData={card} />;
+            });
           })}
         </Box>
       </Box>
