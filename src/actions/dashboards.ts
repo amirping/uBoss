@@ -2,6 +2,7 @@ import * as Types from "./actionTypes";
 import dashboardApi from "../api/dashboardApi";
 import { netError } from "./net";
 import { closeDashboardCreator } from "./view";
+import { loadCards } from "./cards";
 export function loadDashboard(dashboardID: any, token: any) {
   console.log("Fire action -> loadDashboard");
   return function(dispatch: any) {
@@ -10,8 +11,8 @@ export function loadDashboard(dashboardID: any, token: any) {
       .then(response => {
         if (response.status === 200) {
           let ndash = response.data;
-
           dispatch(loadDashboardSuccess(ndash));
+          dispatch(loadCards(ndash));
         } else if (response.status === 404) {
           dispatch(
             loadDashboardError({ code: 404, message: "ressource not found" })

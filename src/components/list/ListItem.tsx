@@ -13,65 +13,24 @@ export interface ListItemState {
 class ListItem extends Component<any, ListItemState> {
   constructor(props: any) {
     super(props);
-    console.log("inst List -> ", this.props.listData.id);
-    console.log("data for this list ", this.props.cards);
-    this.state = {
-      data: {
-        tasks: {
-          "tas-1": {
-            id: "tas-1",
-            name: "task one",
-            labels: ["hot", "fast"],
-            due_date: Date.now(),
-            description:
-              "lorem ipsum text here goes whenever u want me to be as feather like creep"
-          },
-          "tas-2": {
-            id: "tas-2",
-            name: "task two",
-            labels: ["hot", "fast"],
-            due_date: Date.now(),
-            description:
-              "lorem ipsum text here goes whenever u want me to be as feather like creep"
-          },
-          "tas-3": {
-            id: "tas-3",
-            name: "task three",
-            labels: ["hot", "fast"],
-            due_date: Date.now(),
-            description:
-              "lorem ipsum text here goes whenever u want me to be as feather like creep"
-          },
-          "tas-4": {
-            id: "tas-3",
-            name: "task three",
-            labels: ["hot", "fast"],
-            due_date: Date.now(),
-            description:
-              "lorem ipsum text here goes whenever u want me to be as feather like creep"
-          },
-          "tas-5": {
-            id: "tas-3",
-            name: "task three",
-            labels: ["hot", "fast"],
-            due_date: Date.now(),
-            description:
-              "lorem ipsum text here goes whenever u want me to be as feather like creep"
-          }
-        },
-        list: {
-          id: "list-1",
-          title: "Done List",
-          taskIds: ["tas-1", "tas-2", "tas-3", "tas-4", "tas-5"]
-        }
-      }
-    };
   }
   componentDidUpdate() {
     console.log("list updates");
   }
-
+  cardsCount = (listCardsData: any) => {
+    let nbCard = 0;
+    Object.keys(listCardsData).map(k => {
+      nbCard += listCardsData[k].length;
+    });
+    // for (let item of listCardsData) {
+    //   console.log(item);
+    //   nbCard += item.length;
+    // }
+    return nbCard;
+  };
   render() {
+    //console.log(Object.entries(this.props.cards));
+    //console.log(this.cardsCount(this.props.cards));
     return (
       <Box
         className="list-main"
@@ -90,16 +49,23 @@ class ListItem extends Component<any, ListItemState> {
           </IconButton>
         </Box>
         <Box direction="column" pad="xsmall">
-          {/* {this.state.data.list.taskIds.map((taskId: any) => {
-            const cardData = this.state.data.tasks[taskId];
-            return <CardItem key={taskId} cardData={cardData} />;
-          })} */}
-          {Object.keys(this.props.cards).map((remoteId: any) => {
-            const remoteCards = this.props.cards[remoteId];
-            remoteCards.map((card: any) => {
-              return <CardItem key={card.id} cardData={card} />;
-            });
-          })}
+          {this.cardsCount(this.props.cards) > 0 ? (
+            Object.keys(this.props.cards).map((remoteId: any) => {
+              const remoteCards = this.props.cards[remoteId];
+              return remoteCards.map((card: any) => {
+                return <CardItem key={card.id} cardData={card} />;
+              });
+            })
+          ) : (
+            <Box
+              margin="small"
+              border="all"
+              background="dark-3"
+              pad="xsmall"
+              round="xsmall">
+              <Text alignSelf="center">There is no card here</Text>
+            </Box>
+          )}
         </Box>
       </Box>
     );

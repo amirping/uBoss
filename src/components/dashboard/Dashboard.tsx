@@ -14,13 +14,18 @@ import ImportedDashboardApi from "../../api/importedDashboardApi";
 export interface DashboardProps {}
 
 export interface DashboardState {
-  data: any;
+  cardsData: any;
 }
 
 class Dashboard extends Component<any, DashboardState> {
   _cardsData: any = [];
   constructor(props: any) {
     super(props);
+    console.log("start");
+
+    this.state = {
+      cardsData: []
+    };
   }
   componentDidMount() {
     console.log("mounted");
@@ -29,6 +34,13 @@ class Dashboard extends Component<any, DashboardState> {
     if (this.props.dashboard_data != undefined && this.props.dashboard_data) {
       Object.keys(this.props.dashboard_data.lists).map(key => {
         this._cardsData[key] = {};
+
+        // update state
+        let cardsDataState = this.state.cardsData;
+        cardsDataState[key] = {};
+        this.setState({
+          cardsData: cardsDataState
+        });
       });
       this.props.dashboard_data.importedDashboards.map((ImportedDash: any) => {
         // goes here
@@ -48,20 +60,38 @@ class Dashboard extends Component<any, DashboardState> {
             .then(result => {
               if (result && result.length > 0) {
                 if (
-                  !this._cardsData[remoteList.idlistLocal][
+                  !this.state.cardsData[remoteList.idlistLocal][
                     ImportedDash.remote_board_id
                   ]
                 ) {
-                  this._cardsData[remoteList.idlistLocal][
+                  let cardsDataState = this.state.cardsData;
+                  cardsDataState[remoteList.idlistLocal][
                     ImportedDash.remote_board_id
                   ] = [];
+                  // this._cardsData[remoteList.idlistLocal][
+                  //   ImportedDash.remote_board_id
+                  // ] = [];
+
+                  // update state
+                  this.setState({
+                    cardsData: cardsDataState
+                  });
                 }
-                this._cardsData[remoteList.idlistLocal][
+                // this._cardsData[remoteList.idlistLocal][
+                //   ImportedDash.remote_board_id
+                // ] = this._cardsData[remoteList.idlistLocal][
+                //   ImportedDash.remote_board_id
+                // ].concat(result);
+                let cardsDataState = this.state.cardsData;
+                cardsDataState[remoteList.idlistLocal][
                   ImportedDash.remote_board_id
-                ] = this._cardsData[remoteList.idlistLocal][
+                ] = cardsDataState[remoteList.idlistLocal][
                   ImportedDash.remote_board_id
                 ].concat(result);
-                console.log(this._cardsData);
+                this.setState({
+                  cardsData: cardsDataState
+                });
+                console.log(this.state.cardsData);
               }
             })
             .catch(err => {
@@ -74,7 +104,7 @@ class Dashboard extends Component<any, DashboardState> {
   componentDidUpdate() {
     // get cards from remote boards and send each card for her list display
     // add socket here to notify whene we need to retrive data again
-    this.cardsLoader();
+    //this.cardsLoader();
   }
   // listRender = () => {
   //   return (
@@ -118,7 +148,7 @@ class Dashboard extends Component<any, DashboardState> {
             <ListItem
               key={listID}
               listData={this.props.dashboard_data.lists[listID]}
-              cards={this._cardsData[listID]}
+              cards={this.props.cards[listID]}
             />
           ))}
         </Box>
@@ -140,15 +170,6 @@ class Dashboard extends Component<any, DashboardState> {
   render() {
     return (
       <Box direction="row" fill background="dark-2">
-        {/* {this.state.data && this.state.data != null ? (
-          <this.DashRender />
-        ) : (
-          <Box>
-            <Text>
-              Select a dashbord from the list at the left or create a new one
-            </Text>
-          </Box>
-        )} */}
         {this.props.selected_dashboard &&
         this.props.selected_dashboard.length !== 0 ? (
           <this.DataLoader />
@@ -182,6 +203,7 @@ const mapStateToProps = (state: any) => {
     error: state.dashboards.error,
     selected_dashboard: state.dashboards.selectedDashboardID,
     dashboard_data: state.dashboards.selectedDashboardData,
+    cards: state.dashboards.cards,
     user: state.auth.user
   };
 };

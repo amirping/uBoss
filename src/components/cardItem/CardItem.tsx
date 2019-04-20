@@ -10,10 +10,9 @@ export interface CardItemState {
   cardData: {};
 }
 
-class CardItem extends Component<CardItemProps, CardItemState> {
+class CardItem extends Component<any, CardItemState> {
   constructor(props: CardItemProps) {
     super(props);
-    //this.state = { :  };
   }
   render() {
     return (
@@ -29,7 +28,7 @@ class CardItem extends Component<CardItemProps, CardItemState> {
               </Text>
             </Box>
             <Text color="black" size="medium">
-              this.props.cardData.name
+              {this.props.cardData.name}
             </Text>
           </CardContent>
         </Card>

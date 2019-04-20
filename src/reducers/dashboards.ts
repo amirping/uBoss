@@ -24,10 +24,38 @@ export default function dashboards(state: any = dashboardsState, action: any) {
     });
   }
   if (action.type === Types.LOAD_DASHBOARD_SUCCESS) {
-    console.log("fiirrreee one");
-    return Object.assign({}, state, {
-      selectedDashboardData: action.payload
+    // create the cards holder in the store
+    // let cardsSkull: any = {};
+    // Object.keys(action.payload.lists).map((idLis: any) => {
+    //   cardsSkull[idLis] = {};
+    //   console.log("still up");
+    // });
+    // action.payload.importedDashboards.map((impDash: any) => {
+    //   const mappedListsKeys = Object.keys(impDash.mappedLists);
+    //   mappedListsKeys.map((key: any) => {
+    //     const mpList = impDash.mappedLists[key];
+    //     cardsSkull[mpList.idlistLocal][impDash.remote_board_id] = [1, 2, 3];
+    //     console.log("still working");
+    //   });
+    // });
+    const cardsSkull: any = Object.keys(action.payload.lists).reduce(
+      (acc, idList) => ({ ...acc, [idList]: {} }),
+      {}
+    );
+
+    action.payload.importedDashboards.forEach((impDash: any) => {
+      Object.keys(impDash.mappedLists).forEach((key: any) => {
+        const mpList = impDash.mappedLists[key];
+        cardsSkull[mpList.idlistLocal][impDash.remote_board_id] = [];
+        //console.log("still working");
+      });
     });
+    // assign and ready to go
+    return {
+      ...state,
+      selectedDashboardData: action.payload,
+      cards: cardsSkull
+    };
   }
   if (action.type === Types.LOAD_DASHBOARD_ERROR) {
     console.log("fiirrreee one");
@@ -103,6 +131,9 @@ export default function dashboards(state: any = dashboardsState, action: any) {
       success: null,
       error: action.error
     });
+  }
+  if (action.type === Types.LOAD_CARDS_SUCCESS) {
+    return { ...state, cards: action.payload };
   }
   return state;
 }

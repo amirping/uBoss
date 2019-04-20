@@ -5,7 +5,8 @@ export default {
   },
   loadedDashboard: {
     selectedDashboardID: null,
-    selectedDashboardData: null
+    selectedDashboardData: null,
+    cards: null
   },
   dashboardTocreate: {
     lists: []
