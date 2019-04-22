@@ -193,4 +193,36 @@ export default class ImportedDashboardApi {
       }
     }
   }
+
+  /**
+   * @summary support only trello for now - the update in trello handle all those action (move card from list - move card from board - update all kind of field )
+   * @param cardID the id of the card at the remote board
+   * @param cardFrom the remote board type
+   * @param userToken the token for the board
+   * @param queryParams the updated fields depand
+   */
+  static updateCard(
+    cardID: string,
+    cardFrom: string,
+    userToken: string,
+    queryParams: any
+  ) {
+    switch (cardFrom) {
+      case "trello": {
+        return trelloApi
+          .updateCard(userToken, cardID, queryParams)
+          .then((result: any) => {
+            return result;
+          })
+          .catch((err: any) => {
+            console.log(err);
+            return err;
+          });
+      }
+      default: {
+        console.log("error -> not supported");
+        throw "remote Board not yet supported";
+      }
+    }
+  }
 }

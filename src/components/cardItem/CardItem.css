@@ -1,9 +1,30 @@
 .label {
     padding-left: 8px;
     padding-right: 8px;
-    color: black;
-    border-radius: 5px
+    border-radius: 5px;
+    min-width: 20px;
+    text-align: center;
 }
+
+.card {
+    user-select: none;
+    cursor: pointer;
+    z-index: 9999 !important;
+}
+
+.date {
+    color: rgb(68, 68, 68);
+    font-size: 12px;
+}
+
+.center-icon {
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+/* .date::before {
+    content: '⏰ '
+} */
 
 .label-red {
     background: #f03434;

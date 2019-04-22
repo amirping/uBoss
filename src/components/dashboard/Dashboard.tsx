@@ -11,6 +11,7 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import * as dashboardsActions from "../../actions/dashboards";
 import ImportedDashboardApi from "../../api/importedDashboardApi";
+import { DragDropContext } from "react-beautiful-dnd";
 export interface DashboardProps {}
 
 export interface DashboardState {
@@ -121,6 +122,80 @@ class Dashboard extends Component<any, DashboardState> {
   //     </Box>
   //   );
   // };
+  getRemoteListDistination = (
+    idCard: string,
+    DestinationLocalListID: string,
+    sourceLocalListID: string
+  ) => {
+    let remoteListID = "";
+    let remoteBoardID = "";
+    const main_search_section = this.props.cards[sourceLocalListID];
+
+    for (const key in main_search_section) {
+      if (main_search_section.hasOwnProperty(key)) {
+        const search_array: Array<any> = main_search_section[key];
+        let ishere = search_array.filter(card => card.id === idCard);
+        if (ishere.length > 0) {
+          remoteBoardID = key;
+          console.log("found -> ", key);
+          break;
+        }
+      }
+    }
+    if (remoteBoardID.length > 0) {
+      const ImpDash = this.props.dashboard_data.importedDashboards.filter(
+        (dash: any) => dash.remote_board_id === remoteBoardID
+      );
+      if (ImpDash[0]) {
+        console.log("next level -> ", ImpDash);
+        for (const key in ImpDash[0].mappedLists) {
+          if (ImpDash[0].mappedLists.hasOwnProperty(key)) {
+            const elem = ImpDash[0].mappedLists[key];
+            console.log("scanning -> ", elem);
+            console.log(
+              elem.idlistLocal,
+              "===",
+              DestinationLocalListID,
+              "->",
+              elem.idlistLocal === DestinationLocalListID
+            );
+            if (elem.idlistLocal === DestinationLocalListID) {
+              console.log("dound it -> ", elem);
+              remoteListID = elem.idlistRemote;
+            }
+          }
+        }
+      }
+    }
+    return remoteListID;
+  };
+  onDragStart = () => {
+    // TODO: render again
+  };
+  onDragEnd = (result: any) => {
+    // TODO: render again
+    console.log(result);
+    const desti = this.getRemoteListDistination(
+      result.draggableId,
+      result.destination.droppableId,
+      result.source.droppableId
+    );
+    if (desti.length > 0) {
+      ImportedDashboardApi.updateCard(
+        result.draggableId,
+        "trello",
+        this.props.user.accounts["trello"].token,
+        { idList: desti }
+      );
+    } else {
+      alert(
+        "th board from wich the card belong , havn't any list mapped into this list"
+      );
+    }
+  };
+  onBeforeDragStart = () => {
+    // TODO: render again
+  };
   DashRender = () => {
     return (
       <Box direction="column" fill>
@@ -135,23 +210,27 @@ class Dashboard extends Component<any, DashboardState> {
           </Text>
           <DashboardConfig />
         </Box>
-        <Box
-          className="dash-lists"
-          direction="row-responsive"
-          justify="center"
-          align="center"
-          id="dash-lists"
-          pad="small"
-          gap="20px"
-          fill>
-          {Object.keys(this.props.dashboard_data.lists).map((listID: any) => (
-            <ListItem
-              key={listID}
-              listData={this.props.dashboard_data.lists[listID]}
-              cards={this.props.cards[listID]}
-            />
-          ))}
-        </Box>
+        <DragDropContext
+          onDragStart={this.onDragStart}
+          onDragEnd={this.onDragEnd}>
+          <Box
+            className="dash-lists"
+            direction="row"
+            justify="start"
+            align="start"
+            id="dash-lists"
+            pad="small"
+            gap="20px"
+            fill>
+            {Object.keys(this.props.dashboard_data.lists).map((listID: any) => (
+              <ListItem
+                key={listID}
+                listData={this.props.dashboard_data.lists[listID]}
+                cards={this.props.cards[listID]}
+              />
+            ))}
+          </Box>
+        </DragDropContext>
       </Box>
     );
   };

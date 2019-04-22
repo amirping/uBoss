@@ -4,6 +4,9 @@ import "./ListItem.css";
 import CardItem from "../cardItem/CardItem";
 import { IconButton } from "@material-ui/core";
 import MoreVert from "@material-ui/icons/MoreVert";
+import { Droppable } from "react-beautiful-dnd";
+import styled from "styled-components";
+const Cardlist: any = styled.div``;
 export interface ListItemProps {}
 
 export interface ListItemState {
@@ -50,12 +53,21 @@ class ListItem extends Component<any, ListItemState> {
         </Box>
         <Box direction="column" pad="xsmall">
           {this.cardsCount(this.props.cards) > 0 ? (
-            Object.keys(this.props.cards).map((remoteId: any) => {
-              const remoteCards = this.props.cards[remoteId];
-              return remoteCards.map((card: any) => {
-                return <CardItem key={card.id} cardData={card} />;
-              });
-            })
+            <Droppable droppableId={this.props.listData.id}>
+              {provided => (
+                <Cardlist {...provided.droppableProps} ref={provided.innerRef}>
+                  {Object.keys(this.props.cards).map((remoteId: any) => {
+                    const remoteCards = this.props.cards[remoteId];
+                    return remoteCards.map((card: any, index: number) => {
+                      return (
+                        <CardItem key={card.id} cardData={card} index={index} />
+                      );
+                    });
+                  })}
+                  {provided.placeholder}
+                </Cardlist>
+              )}
+            </Droppable>
           ) : (
             <Box
               margin="small"

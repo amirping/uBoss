@@ -69,3 +69,24 @@ export function loadCards(dashboard_data: any) {
 export function cardsLoadedSuccess(payload: any) {
   return { type: Types.LOAD_CARDS_SUCCESS, payload: payload };
 }
+export function updateCard(cardID: string, cardFrom: string, queryParams: any) {
+  const state: any = store.getState();
+  const client_token = state.auth.user.accounts[cardFrom].token;
+  return function(dispatch: any) {
+    return ImportedDashboardApi.updateCard(
+      cardID,
+      cardFrom,
+      client_token,
+      queryParams
+    )
+      .then(response => {
+        //  disptach some thing to update the lists card
+        //dispatch()
+        console.log(response);
+      })
+      .catch(
+        err => console.log(err)
+        // diptach update card error
+      );
+  };
+}
