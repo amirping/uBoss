@@ -1,7 +1,7 @@
 import * as Types from "./actionTypes";
 import dashboardApi from "../api/dashboardApi";
 import { netError } from "./net";
-import { closeDashboardCreator } from "./view";
+import { closeDashboardCreator, openCardData, closeCardData } from "./view";
 import { loadCards } from "./cards";
 export function loadDashboard(dashboardID: any, token: any) {
   console.log("Fire action -> loadDashboard");
@@ -185,4 +185,16 @@ export function selectDashboard(dashboardID: string, token: string) {
     dispatch({ type: Types.SELECT_DASHBOARD, payload: dashboardID });
     dispatch(loadDashboard(dashboardID, token));
   };
+}
+export function selectCard(card: any) {
+  return function(dispatch: any) {
+    dispatch(setingSelectedCard(card));
+    dispatch(openCardData());
+  };
+}
+export function setingSelectedCard(card: any) {
+  return { type: Types.SELECTED_CARD_SET, payload: card };
+}
+export function unsetSelectedCard() {
+  return { type: Types.SELECTED_CARD_UNSET };
 }

@@ -164,5 +164,15 @@ export default function dashboards(state: any = dashboardsState, action: any) {
     console.log(AllCards);
     return { ...state, cards: AllCards };
   }
+  if (action.type === Types.SELECTED_CARD_SET) {
+    return Object.assign({}, state, {
+      selectedCard: action.payload
+    });
+  }
+  if (action.type === Types.SELECTED_CARD_UNSET) {
+    return Object.assign({}, state, {
+      selectedCard: null
+    });
+  }
   return state;
 }

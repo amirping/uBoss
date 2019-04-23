@@ -6,7 +6,8 @@ import Moment from "react-moment";
 import { Draggable } from "react-beautiful-dnd";
 import styled from "styled-components";
 import "./CardItem.css";
-import { Provider } from "react-redux";
+import { Provider, connect } from "react-redux";
+import { selectCard } from "../../actions/dashboards";
 const Item: any = styled.div``;
 export interface CardItemState {
   cardData: {};
@@ -16,6 +17,9 @@ class CardItem extends Component<any, CardItemState> {
   constructor(props: any) {
     super(props);
   }
+  openCardData = () => {
+    this.props.selectCard(this.props.cardData);
+  };
   render() {
     return (
       <Draggable draggableId={this.props.cardData.id} index={this.props.index}>
@@ -25,7 +29,7 @@ class CardItem extends Component<any, CardItemState> {
             {...provided.dragHandleProps}
             ref={provided.innerRef}>
             <Box margin={{ top: "xsmall" }}>
-              <Card className="card">
+              <Card className="card" onClick={this.openCardData}>
                 <CardContent>
                   <Box direction="row-responsive">
                     {this.props.cardData.due != null && (
@@ -76,4 +80,14 @@ class CardItem extends Component<any, CardItemState> {
     );
   }
 }
-export default CardItem;
+
+const mapDispatchToProps = (dispatch: any) => {
+  return {
+    selectCard: (card: any) => dispatch(selectCard(card))
+  };
+};
+
+export default connect(
+  null,
+  mapDispatchToProps
+)(CardItem);
