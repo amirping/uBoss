@@ -37,5 +37,15 @@ export default function auth(state = initialState.view, action: any) {
       dashboardConfig: true
     });
   }
+  if (action.type === Types.CARD_DATA_OPEN) {
+    return Object.assign({}, state, {
+      cardData: true
+    });
+  }
+  if (action.type === Types.CARD_DATA_CLOSE) {
+    return Object.assign({}, state, {
+      cardData: false
+    });
+  }
   return state;
 }

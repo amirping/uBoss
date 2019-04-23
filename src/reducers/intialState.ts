@@ -16,7 +16,8 @@ export default {
     profileManagement: false,
     userProfile_anchorEl: null,
     dashboardCreator: false,
-    dashboardConfig: false
+    dashboardConfig: false,
+    cardData: false
   },
   auth: {
     connected: !!localStorage.getItem("token"),

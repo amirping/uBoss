@@ -20,3 +20,9 @@ export function openDashboardConfig() {
 export function closeDashboardConfig() {
   return { type: Types.DASHBOARD_CONFIG_CLOSE };
 }
+export function closeCardData() {
+  return { type: Types.CARD_DATA_CLOSE };
+}
+export function openCardData() {
+  return { type: Types.CARD_DATA_OPEN };
+}

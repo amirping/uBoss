@@ -1,6 +1,16 @@
 import React, { Component } from "react";
 import { Box, Text, Heading, Paragraph } from "grommet";
-import { IconButton, Icon, CircularProgress } from "@material-ui/core";
+import {
+  IconButton,
+  Icon,
+  CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  Button,
+  DialogActions
+} from "@material-ui/core";
 import EditIcon from "@material-ui/icons/Edit";
 import "./Dashboard.css";
 import img_Pick from "./pick.png";
@@ -217,6 +227,7 @@ class Dashboard extends Component<any, DashboardState> {
       </Box>
     );
   };
+  handleClose = () => {};
   DataLoader = () => {
     return this.props.dashboard_data &&
       this.props.dashboard_data.length !== 0 ? (
@@ -255,6 +266,28 @@ class Dashboard extends Component<any, DashboardState> {
             {/* <img src="https://i.gifer.com/yH.gif" alt="where are you" /> */}
           </Box>
         )}
+        <Dialog
+          open={this.props.cardDataDialog}
+          onClose={this.handleClose}
+          aria-labelledby="responsive-dialog-title">
+          <DialogTitle id="responsive-dialog-title">
+            {"Use Google's location service?"}
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Let Google help apps determine location. This means sending
+              anonymous location data to Google, even when no apps are running.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleClose} color="primary">
+              Disagree
+            </Button>
+            <Button onClick={this.handleClose} color="primary" autoFocus>
+              Agree
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Box>
     );
   }
@@ -266,7 +299,8 @@ const mapStateToProps = (state: any) => {
     selected_dashboard: state.dashboards.selectedDashboardID,
     dashboard_data: state.dashboards.selectedDashboardData,
     cards: state.dashboards.cards,
-    user: state.auth.user
+    user: state.auth.user,
+    cardDataDialog: state.view.cardData
   };
 };
 
