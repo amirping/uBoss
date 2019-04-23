@@ -10,6 +10,7 @@ import DashboardConfig from "../dashboardConfig/DashboardConfig";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import * as dashboardsActions from "../../actions/dashboards";
+import * as cardsActions from "../../actions/cards";
 import ImportedDashboardApi from "../../api/importedDashboardApi";
 import { DragDropContext } from "react-beautiful-dnd";
 export interface DashboardProps {}
@@ -103,25 +104,11 @@ class Dashboard extends Component<any, DashboardState> {
     }
   };
   componentDidUpdate() {
+    console.log("UPDATE DASHBOARD - COMP");
     // get cards from remote boards and send each card for her list display
     // add socket here to notify whene we need to retrive data again
     //this.cardsLoader();
   }
-  // listRender = () => {
-  //   return (
-  //     <Box
-  //       className="list-main"
-  //       direction="column"
-  //       border="all"
-  //       width="medium"
-  //       height="medium"
-  //       margin={{ top: "xsmall" }}
-  //       animation="fadeIn"
-  //       background="dark-3">
-  //       list here{" "}
-  //     </Box>
-  //   );
-  // };
   getRemoteListDistination = (
     idCard: string,
     DestinationLocalListID: string,
@@ -137,7 +124,6 @@ class Dashboard extends Component<any, DashboardState> {
         let ishere = search_array.filter(card => card.id === idCard);
         if (ishere.length > 0) {
           remoteBoardID = key;
-          console.log("found -> ", key);
           break;
         }
       }
@@ -147,20 +133,10 @@ class Dashboard extends Component<any, DashboardState> {
         (dash: any) => dash.remote_board_id === remoteBoardID
       );
       if (ImpDash[0]) {
-        console.log("next level -> ", ImpDash);
         for (const key in ImpDash[0].mappedLists) {
           if (ImpDash[0].mappedLists.hasOwnProperty(key)) {
             const elem = ImpDash[0].mappedLists[key];
-            console.log("scanning -> ", elem);
-            console.log(
-              elem.idlistLocal,
-              "===",
-              DestinationLocalListID,
-              "->",
-              elem.idlistLocal === DestinationLocalListID
-            );
             if (elem.idlistLocal === DestinationLocalListID) {
-              console.log("dound it -> ", elem);
               remoteListID = elem.idlistRemote;
             }
           }
@@ -175,22 +151,29 @@ class Dashboard extends Component<any, DashboardState> {
   onDragEnd = (result: any) => {
     // TODO: render again
     console.log(result);
-    const desti = this.getRemoteListDistination(
-      result.draggableId,
-      result.destination.droppableId,
-      result.source.droppableId
-    );
-    if (desti.length > 0) {
-      ImportedDashboardApi.updateCard(
-        result.draggableId,
-        "trello",
-        this.props.user.accounts["trello"].token,
-        { idList: desti }
-      );
+    if (result.destination != null) {
+      if (result.destination.droppableId != result.source.droppableId) {
+        const desti = this.getRemoteListDistination(
+          result.draggableId,
+          result.destination.droppableId,
+          result.source.droppableId
+        );
+        if (desti.length > 0) {
+          this.props.actions_card.updateCard(
+            result.draggableId,
+            "trello",
+            { idList: desti },
+            result.source.droppableId,
+            result.destination.droppableId
+          );
+        } else {
+          alert(
+            "th board from wich the card belong , havn't any list mapped into this list"
+          );
+        }
+      }
     } else {
-      alert(
-        "th board from wich the card belong , havn't any list mapped into this list"
-      );
+      alert("drag it inside a list not out");
     }
   };
   onBeforeDragStart = () => {
@@ -289,9 +272,8 @@ const mapStateToProps = (state: any) => {
 
 const mapDispatchToProps = (dispatch: any) => {
   return {
-    // openCreator: () => dispatch(openDashboardCreator()),
-    // closeCreator: () => dispatch(closeDashboardCreator()), --> will changed by dashconfig
-    actions: bindActionCreators(dashboardsActions, dispatch)
+    actions: bindActionCreators(dashboardsActions, dispatch),
+    actions_card: bindActionCreators(cardsActions, dispatch)
   };
 };
 

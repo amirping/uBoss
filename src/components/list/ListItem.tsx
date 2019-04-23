@@ -6,6 +6,11 @@ import { IconButton } from "@material-ui/core";
 import MoreVert from "@material-ui/icons/MoreVert";
 import { Droppable } from "react-beautiful-dnd";
 import styled from "styled-components";
+import { bindActionCreators } from "redux";
+import * as dashboardsActions from "../../actions/dashboards";
+import * as cardsActions from "../../actions/cards";
+import { connect } from "react-redux";
+
 const Cardlist: any = styled.div``;
 export interface ListItemProps {}
 
@@ -25,15 +30,9 @@ class ListItem extends Component<any, ListItemState> {
     Object.keys(listCardsData).map(k => {
       nbCard += listCardsData[k].length;
     });
-    // for (let item of listCardsData) {
-    //   console.log(item);
-    //   nbCard += item.length;
-    // }
     return nbCard;
   };
   render() {
-    //console.log(Object.entries(this.props.cards));
-    //console.log(this.cardsCount(this.props.cards));
     return (
       <Box
         className="list-main"
@@ -69,19 +68,42 @@ class ListItem extends Component<any, ListItemState> {
               )}
             </Droppable>
           ) : (
-            <Box
-              margin="small"
-              border="all"
-              background="dark-3"
-              pad="xsmall"
-              round="xsmall">
-              <Text alignSelf="center">There is no card here</Text>
-            </Box>
+            <Droppable droppableId={this.props.listData.id}>
+              {provided => (
+                <Cardlist {...provided.droppableProps} ref={provided.innerRef}>
+                  <Box
+                    margin="small"
+                    border="all"
+                    background="dark-3"
+                    pad="xsmall"
+                    round="xsmall">
+                    <Text alignSelf="center">There is no card here</Text>
+                  </Box>
+                  {provided.placeholder}
+                </Cardlist>
+              )}
+            </Droppable>
           )}
         </Box>
       </Box>
     );
   }
 }
+const mapStateToProps = (state: any) => {
+  return {
+    success: state.dashboards.success,
+    error: state.dashboards.error,
+    dashboard_data: state.dashboards.selectedDashboardData,
+    cards: state.dashboards.cards,
+    user: state.auth.user
+  };
+};
+
+const mapDispatchToProps = (dispatch: any) => {
+  return {
+    actions: bindActionCreators(dashboardsActions, dispatch),
+    actions_card: bindActionCreators(cardsActions, dispatch)
+  };
+};
 
 export default ListItem;

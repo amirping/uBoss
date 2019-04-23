@@ -135,5 +135,34 @@ export default function dashboards(state: any = dashboardsState, action: any) {
   if (action.type === Types.LOAD_CARDS_SUCCESS) {
     return { ...state, cards: action.payload };
   }
+  if (action.type === Types.UPDATE_CARD_SUCCESS) {
+    console.log("updating state");
+    var AllCards = Object.assign({}, state.cards);
+    const oldListID = action.payload.oldList;
+    const newListID = action.payload.newList;
+    const card = action.payload.card;
+    // 1 remore the card from the old list
+    for (
+      let index = 0;
+      index < AllCards[oldListID][card.idBoard].length;
+      index++
+    ) {
+      const element = AllCards[oldListID][card.idBoard][index];
+      if (element.id === card.id) {
+        AllCards[oldListID][card.idBoard].splice(index, 1);
+        break;
+      }
+    }
+    // 2 add the card into the new list
+    if (
+      AllCards[newListID][card.idBoard] === undefined ||
+      AllCards[newListID][card.idBoard] === null
+    ) {
+      AllCards[newListID][card.idBoard] = [];
+    }
+    AllCards[newListID][card.idBoard].push(card);
+    console.log(AllCards);
+    return { ...state, cards: AllCards };
+  }
   return state;
 }

@@ -207,6 +207,7 @@ export default class ImportedDashboardApi {
     userToken: string,
     queryParams: any
   ) {
+    console.log("we start update requests for card");
     switch (cardFrom) {
       case "trello": {
         return trelloApi

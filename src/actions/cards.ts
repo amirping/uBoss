@@ -69,9 +69,16 @@ export function loadCards(dashboard_data: any) {
 export function cardsLoadedSuccess(payload: any) {
   return { type: Types.LOAD_CARDS_SUCCESS, payload: payload };
 }
-export function updateCard(cardID: string, cardFrom: string, queryParams: any) {
+export function updateCard(
+  cardID: string,
+  cardFrom: string,
+  queryParams: any,
+  oldLocalListID: string,
+  newLocalListID: string
+) {
   const state: any = store.getState();
   const client_token = state.auth.user.accounts[cardFrom].token;
+  console.log("start update card action");
   return function(dispatch: any) {
     return ImportedDashboardApi.updateCard(
       cardID,
@@ -81,12 +88,22 @@ export function updateCard(cardID: string, cardFrom: string, queryParams: any) {
     )
       .then(response => {
         //  disptach some thing to update the lists card
-        //dispatch()
-        console.log(response);
+        dispatch(cardUpdateSuccess(response, oldLocalListID, newLocalListID));
+        //console.log(response);
       })
       .catch(
         err => console.log(err)
         // diptach update card error
       );
+  };
+}
+export function cardUpdateSuccess(
+  card: any,
+  oldListID: string,
+  listLocalID: string
+) {
+  return {
+    type: Types.UPDATE_CARD_SUCCESS,
+    payload: { card: card, oldList: oldListID, newList: listLocalID }
   };
 }
