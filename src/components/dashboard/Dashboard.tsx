@@ -9,7 +9,11 @@ import {
   DialogContent,
   DialogContentText,
   Button,
-  DialogActions
+  DialogActions,
+  Typography,
+  CardMedia,
+  Card,
+  CardContent
 } from "@material-ui/core";
 import EditIcon from "@material-ui/icons/Edit";
 import "./Dashboard.css";
@@ -23,6 +27,10 @@ import * as dashboardsActions from "../../actions/dashboards";
 import * as cardsActions from "../../actions/cards";
 import ImportedDashboardApi from "../../api/importedDashboardApi";
 import { DragDropContext } from "react-beautiful-dnd";
+import { closeCardData } from "../../actions/view";
+import { TextAlignFull, Attachment } from "grommet-icons";
+import { ClippingRectangle } from "react-native";
+import Moment from "react-moment";
 export interface DashboardProps {}
 
 export interface DashboardState {
@@ -227,7 +235,9 @@ class Dashboard extends Component<any, DashboardState> {
       </Box>
     );
   };
-  handleClose = () => {};
+  handleClose = () => {
+    this.props.closeCardData();
+  };
   DataLoader = () => {
     return this.props.dashboard_data &&
       this.props.dashboard_data.length !== 0 ? (
@@ -238,6 +248,141 @@ class Dashboard extends Component<any, DashboardState> {
           <CircularProgress color="secondary" style={{ margin: "auto" }} />
         </Box>
       </Box>
+    );
+  };
+  getAttachmentCover = (idAttachment: string, attachments: Array<any>) => {
+    let v = attachments.filter(x => x.id === idAttachment);
+    return v[0];
+  };
+  CardDialog = () => {
+    return (
+      this.props.selectedCard && (
+        <Dialog
+          open={this.props.cardDataDialog}
+          onClose={this.handleClose}
+          aria-labelledby="responsive-dialog-title">
+          {this.props.selectedCard.idAttachmentCover != null &&
+            this.props.selectedCard.attachments.length > 0 && (
+              <CardMedia
+                className="media"
+                image={
+                  this.getAttachmentCover(
+                    this.props.selectedCard.idAttachmentCover,
+                    this.props.selectedCard.attachments
+                  ).url
+                }
+                title="Contemplative Reptile"
+              />
+            )}
+          <DialogTitle id="responsive-dialog-title">
+            {this.props.selectedCard.name}
+          </DialogTitle>
+          <DialogContent>
+            {(this.props.selectedCard.desc.length > 0 ||
+              this.props.selectedCard.due != null) && (
+              <Box direction="row-responsive" gap="20px">
+                {this.props.selectedCard.labels.length > 0 && (
+                  <Box direction="column">
+                    <Typography variant="overline" gutterBottom>
+                      Lables
+                    </Typography>
+                    <Box direction="row-responsive" gap="5px" fill="horizontal">
+                      {this.props.selectedCard.labels.map((v: any) => (
+                        <Box
+                          round="small"
+                          pad="xsmall"
+                          key={v.id}
+                          className="inCardLabel"
+                          background={{ color: v.color }}>
+                          <Text size="xsmall">{v.name || "\u00A0\u00A0"}</Text>
+                        </Box>
+                      ))}
+                    </Box>
+                  </Box>
+                )}
+                {this.props.selectedCard.due != null && (
+                  <Box direction="column">
+                    <Typography variant="overline" gutterBottom>
+                      DUE DATE
+                    </Typography>
+                    <Box direction="row-responsive" gap="5px" fill="horizontal">
+                      <Text size="small">
+                        <Moment
+                          format="D MMM YYYY - HH:mm"
+                          date={this.props.selectedCard.due}
+                        />
+                        {this.props.selectedCard.dueComplete && (
+                          <span>[complete]</span>
+                        )}
+                        {!this.props.selectedCard.dueComplete && (
+                          <span>
+                            [incomplete] -{" "}
+                            <Moment
+                              fromNow
+                              date={this.props.selectedCard.due}
+                            />
+                          </span>
+                        )}
+                      </Text>
+                    </Box>
+                  </Box>
+                )}
+              </Box>
+            )}
+            {this.props.selectedCard.desc.length > 0 && (
+              <React.Fragment>
+                <Typography variant="h6" gutterBottom>
+                  <TextAlignFull color="plain" size="small" /> Description
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  {this.props.selectedCard.desc
+                    .split("\n\n")
+                    .map((s: string, i: number) => (
+                      <li className="listDesc" key={i}>
+                        {s}
+                      </li>
+                    ))}
+                </Typography>
+              </React.Fragment>
+            )}
+
+            {this.props.selectedCard.attachments.length > 0 && (
+              <React.Fragment>
+                <Typography variant="h6" gutterBottom>
+                  <Attachment color="plain" size="small" /> Attachments
+                </Typography>
+                <Box direction="column" gap="10px">
+                  {this.props.selectedCard.attachments.map((attach: any) => (
+                    <a href={attach.url} target="_blank" key={attach.id}>
+                      <Card className="attachItem">
+                        <CardMedia image={attach.url} className="sideMedia" />
+                        <div>
+                          <CardContent>
+                            <Typography variant="body1" gutterBottom>
+                              {attach.name}
+                            </Typography>
+                            <Typography variant="body1" gutterBottom>
+                              Date : <Moment fromNow date={attach.date} />
+                            </Typography>
+                          </CardContent>
+                        </div>
+                      </Card>
+                    </a>
+                  ))}
+                </Box>
+              </React.Fragment>
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleClose} color="primary">
+              Close
+            </Button>
+            <Button onClick={this.handleClose} color="primary" autoFocus>
+              Agree
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )
     );
   };
   render() {
@@ -266,28 +411,7 @@ class Dashboard extends Component<any, DashboardState> {
             {/* <img src="https://i.gifer.com/yH.gif" alt="where are you" /> */}
           </Box>
         )}
-        <Dialog
-          open={this.props.cardDataDialog}
-          onClose={this.handleClose}
-          aria-labelledby="responsive-dialog-title">
-          <DialogTitle id="responsive-dialog-title">
-            {"Use Google's location service?"}
-          </DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Let Google help apps determine location. This means sending
-              anonymous location data to Google, even when no apps are running.
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.handleClose} color="primary">
-              Disagree
-            </Button>
-            <Button onClick={this.handleClose} color="primary" autoFocus>
-              Agree
-            </Button>
-          </DialogActions>
-        </Dialog>
+        <this.CardDialog />
       </Box>
     );
   }
@@ -300,14 +424,16 @@ const mapStateToProps = (state: any) => {
     dashboard_data: state.dashboards.selectedDashboardData,
     cards: state.dashboards.cards,
     user: state.auth.user,
-    cardDataDialog: state.view.cardData
+    cardDataDialog: state.view.cardData,
+    selectedCard: state.dashboards.selectedCard
   };
 };
 
 const mapDispatchToProps = (dispatch: any) => {
   return {
     actions: bindActionCreators(dashboardsActions, dispatch),
-    actions_card: bindActionCreators(cardsActions, dispatch)
+    actions_card: bindActionCreators(cardsActions, dispatch),
+    closeCardData: () => dispatch(closeCardData())
   };
 };
 
