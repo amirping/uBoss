@@ -1,0 +1,22 @@
+.dash-lists {
+    flex-flow: nowrap;
+    overflow-x: auto;
+}
+
+.listDesc {
+    list-style-type: none;
+    list-style: none;
+}
+
+.media {
+    height: 140px;
+    background-size: contain !important;
+}
+
+.attachItem {
+    display: flex;
+}
+
+.sideMedia {
+    width: 140px;
+}
