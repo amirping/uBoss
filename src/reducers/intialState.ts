@@ -6,6 +6,7 @@ export default {
   loadedDashboard: {
     selectedDashboardID: null,
     selectedCard: null,
+    moreCardData: null,
     selectedDashboardData: null,
     cards: null
   },

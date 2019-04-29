@@ -171,7 +171,17 @@ export default function dashboards(state: any = dashboardsState, action: any) {
   }
   if (action.type === Types.SELECTED_CARD_UNSET) {
     return Object.assign({}, state, {
-      selectedCard: null
+      selectedCard: null,
+      moreCardData: null
+    });
+  }
+  if (action.type === Types.LOAD_MORE_CARD_DATA_SUCCESS) {
+    let comments = action.payload.comments.filter(
+      (com: any) => com.type === "commentCard"
+    );
+    action.payload.comments = comments;
+    return Object.assign({}, state, {
+      moreCardData: action.payload
     });
   }
   return state;

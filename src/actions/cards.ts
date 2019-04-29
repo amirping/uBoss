@@ -54,7 +54,10 @@ export function loadCards(dashboard_data: any) {
               ].concat(result);
               //console.log(_cardsData);
               if (jobDone === jobTodo) {
-                dispatch(cardsLoadedSuccess(_cardsData));
+                // safe update
+                setTimeout(() => {
+                  dispatch(cardsLoadedSuccess(_cardsData));
+                }, 3000);
               }
             }
           })
@@ -92,7 +95,10 @@ export function updateCard(
         //console.log(response);
       })
       .catch(
-        err => console.log(err)
+        err => {
+          console.log(err);
+          dispatch(netError(err));
+        }
         // diptach update card error
       );
   };
@@ -105,5 +111,48 @@ export function cardUpdateSuccess(
   return {
     type: Types.UPDATE_CARD_SUCCESS,
     payload: { card: card, oldList: oldListID, newList: listLocalID }
+  };
+}
+
+/**
+ * @summary this function only working for trello cards since the provide the comments & checklist in diff api
+ */
+export function loadCardMoreData(secret_token: string, cardID: string) {
+  // get comments
+  // get checklists
+  let cards_more_data = {
+    comments: null,
+    checklists: null
+  };
+  return function(dispatch: any) {
+    return TrelloApi.getCardComments(cardID, secret_token)
+      .then(response => {
+        console.log("comments ---------------------- ");
+        console.log(response);
+        cards_more_data.comments = response;
+        return TrelloApi.getCardChecklist(cardID, secret_token)
+          .then(response => {
+            console.log("Checklist -------------------- ");
+            console.log(response);
+            cards_more_data.checklists = response;
+            //dispatch
+            dispatch(cardLoadMoreDataSuccess(cards_more_data));
+          })
+          .catch(error => {
+            //dispatch
+            dispatch(netError(error));
+          });
+      })
+      .catch(error => {
+        // dispatch error
+        dispatch(netError(error));
+      });
+  };
+}
+
+export function cardLoadMoreDataSuccess(payload: any) {
+  return {
+    type: Types.LOAD_MORE_CARD_DATA_SUCCESS,
+    payload: payload
   };
 }

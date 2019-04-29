@@ -91,4 +91,30 @@ export default class TrelloApi {
     }
     return string_q;
   }
+  static getCardComments(cardID: string, user_token: string) {
+    const api_url = `${this.URL}cards/${cardID}/actions?key=${
+      this.APP_KEY
+    }&token=${user_token}`;
+    const request = new Request(api_url);
+    return fetch(request)
+      .then(response => {
+        return response.json();
+      })
+      .catch(error => {
+        return error;
+      });
+  }
+  static getCardChecklist(cardID: string, user_token: string) {
+    const api_url = `${this.URL}cards/${cardID}/checklists?key=${
+      this.APP_KEY
+    }&token=${user_token}`;
+    const request = new Request(api_url);
+    return fetch(request)
+      .then(response => {
+        return response.json();
+      })
+      .catch(error => {
+        return error;
+      });
+  }
 }
