@@ -1,7 +1,5 @@
 import * as Types from "./actionTypes";
-import dashboardApi from "../api/dashboardApi";
 import { netError } from "./net";
-import { closeDashboardCreator } from "./view";
 import TrelloApi from "../api/trelloApi";
 import store from "../store/store";
 import ImportedDashboardApi from "../api/importedDashboardApi";

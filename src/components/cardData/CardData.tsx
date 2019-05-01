@@ -13,15 +13,18 @@ import {
   ListItem,
   ListItemAvatar,
   ListItemText,
-  Avatar
+  Avatar,
+  ListItemSecondaryAction,
+  Checkbox
 } from "@material-ui/core";
-import { Box, Text } from "grommet";
+import { Box, Text, Tabs, Tab } from "grommet";
 import Moment from "react-moment";
-import { TextAlignFull, Attachment } from "grommet-icons";
+import { TextAlignFull, Attachment, Chat, Task } from "grommet-icons";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import * as cardsActions from "../../actions/cards";
 import { closeCardData } from "../../actions/view";
+import { unsetSelectedCard } from "../../actions/dashboards";
 export interface CardDataState {}
 
 class CardData extends Component<any, CardDataState> {
@@ -41,6 +44,7 @@ class CardData extends Component<any, CardDataState> {
   };
   handleClose = () => {
     this.props.closeCardData();
+    this.props.unsetCard();
   };
   render() {
     return (
@@ -184,47 +188,78 @@ class CardData extends Component<any, CardDataState> {
             </DialogContent>
           </Box>
           {this.props.moreCardData && (
-            <Box direction="column" width="40%">
+            <Box direction="column" width="40%" fill="vertical">
               {this.props.moreCardData.comments != undefined && (
-                <Box id="comments-section">
+                <Box id="comments-section" height="50%">
+                  <Typography variant="h6" gutterBottom>
+                    <Chat color="plain" size="small" /> Comments
+                  </Typography>
                   {this.props.moreCardData.comments.length > 0 ? (
-                    <List>
-                      {this.props.moreCardData.comments.map((com: any) => (
-                        <ListItem key={com.id} alignItems="flex-start">
-                          <ListItemAvatar>
-                            <Avatar>{com.memberCreator.initials}</Avatar>
-                          </ListItemAvatar>
-                          <ListItemText
-                            secondary={
-                              <React.Fragment>
-                                <Typography
-                                  component="span"
-                                  color="textPrimary">
-                                  {com.memberCreator.fullName}
-                                </Typography>
-                                {com.data.text}
-                              </React.Fragment>
-                            }
-                          />
-                        </ListItem>
-                      ))}
-                    </List>
+                    <Box fill overflow="auto">
+                      <List>
+                        {this.props.moreCardData.comments.map((com: any) => (
+                          <ListItem key={com.id} alignItems="flex-start">
+                            <ListItemAvatar>
+                              <Avatar>{com.memberCreator.initials}</Avatar>
+                            </ListItemAvatar>
+                            <ListItemText
+                              secondary={
+                                <React.Fragment>
+                                  <Typography
+                                    component="span"
+                                    color="textPrimary">
+                                    {com.memberCreator.fullName}
+                                  </Typography>
+                                  {com.data.text}
+                                </React.Fragment>
+                              }
+                            />
+                          </ListItem>
+                        ))}
+                      </List>
+                    </Box>
                   ) : (
-                    <span>No comments here </span>
+                    <Typography variant="body1" gutterBottom>
+                      No Comments on this card
+                    </Typography>
                   )}
                 </Box>
               )}
-              <Box id="checklist-section">
-                {this.props.moreCardData.checklists != undefined && (
-                  <Box id="comments-section">
-                    {this.props.moreCardData.checklists.length > 0 ? (
-                      <span>We got checklists</span>
-                    ) : (
-                      <span>No checklists here </span>
-                    )}
-                  </Box>
-                )}
-              </Box>
+              {this.props.moreCardData.checklists != undefined && (
+                <Box id="checklist-section" height="50%" background="light-0">
+                  <Typography variant="h6" gutterBottom>
+                    <Task color="plain" size="small" /> Checklists
+                  </Typography>
+                  {this.props.moreCardData.checklists.length > 0 ? (
+                    <Box fill overflow="auto">
+                      <Tabs>
+                        {this.props.moreCardData.checklists.map((chk: any) => (
+                          <Tab title={chk.name} key={chk.id}>
+                            <Box>
+                              <List dense>
+                                {chk.checkItems.map((item: any) => (
+                                  <ListItem key={item.id} button>
+                                    <ListItemText primary={item.name} />
+                                    <ListItemSecondaryAction>
+                                      <Checkbox
+                                        checked={item.state !== "incomplete"}
+                                      />
+                                    </ListItemSecondaryAction>
+                                  </ListItem>
+                                ))}
+                              </List>
+                            </Box>
+                          </Tab>
+                        ))}
+                      </Tabs>
+                    </Box>
+                  ) : (
+                    <Typography variant="body1" gutterBottom>
+                      No checklists on this card
+                    </Typography>
+                  )}
+                </Box>
+              )}
             </Box>
           )}
         </Box>
@@ -254,7 +289,8 @@ const mapStateToProps = (state: any) => {
 const mapDispatchToProps = (dispatch: any) => {
   return {
     actions_card: bindActionCreators(cardsActions, dispatch),
-    closeCardData: () => dispatch(closeCardData())
+    closeCardData: () => dispatch(closeCardData()),
+    unsetCard: () => dispatch(unsetSelectedCard())
   };
 };
 export default connect(
