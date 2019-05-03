@@ -8,7 +8,14 @@ export default {
     selectedCard: null,
     moreCardData: null,
     selectedDashboardData: null,
-    cards: null
+    cards: null,
+    viewConfig: {
+      sortByProject: false,
+      timeout: false,
+      sooner: false,
+      closed: false,
+      soonerTime: 1
+    }
   },
   dashboardTocreate: {
     lists: []

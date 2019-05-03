@@ -26,7 +26,7 @@ import {
   Switch,
   ListItemIcon
 } from "@material-ui/core";
-import { Connect, Connectivity, Unlink } from "grommet-icons";
+import { Connect, Connectivity, Unlink, Configure } from "grommet-icons";
 import { shortName } from "../../utils";
 import uuidv1 from "uuid";
 import { Box, Tabs, Tab, Form, Text, Paragraph } from "grommet";
@@ -634,7 +634,7 @@ class DashboardConfig extends Component<any, DashboardConfigState> {
     return (
       <Box>
         <IconButton onClick={this.handleOpen}>
-          <EditIcon fontSize="small" />
+          <Configure fontSize="small" />
         </IconButton>
         <Dialog
           open={this.props.dashboardConfig}

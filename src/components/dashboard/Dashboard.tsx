@@ -13,6 +13,7 @@ import ImportedDashboardApi from "../../api/importedDashboardApi";
 import { DragDropContext } from "react-beautiful-dnd";
 import { closeCardData } from "../../actions/view";
 import CardData from "../cardData/CardData";
+import ViewConfig from "../viewConfig/ViewConfig";
 export interface DashboardProps {}
 
 export interface DashboardState {
@@ -187,11 +188,15 @@ class Dashboard extends Component<any, DashboardState> {
           pad="medium"
           id="dash-header"
           border="bottom"
-          gap="10px">
-          <Text size="xxlarge" truncate={true} className="dash-name">
-            {this.props.dashboard_data.title}
-          </Text>
-          <DashboardConfig />
+          gap="10px"
+          justify="between">
+          <Box direction="row">
+            <Text size="xxlarge" truncate={true} className="dash-name">
+              {this.props.dashboard_data.title}
+            </Text>
+            <DashboardConfig />
+          </Box>
+          <ViewConfig />
         </Box>
         <DragDropContext
           onDragStart={this.onDragStart}
