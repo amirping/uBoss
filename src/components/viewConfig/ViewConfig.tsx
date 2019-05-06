@@ -11,6 +11,7 @@ import {
   TextField
 } from "@material-ui/core";
 import { connect } from "react-redux";
+import { changeDashboardView } from "../../actions/dashboards";
 export interface ViewConfigProps {}
 
 export interface ViewConfigState {
@@ -22,85 +23,72 @@ class ViewConfig extends Component<any, ViewConfigState> {
     super(props);
     this.state = { open: false };
   }
+  handlerChange = (name: string) => () => {
+    console.log("changing the view config ", name);
+    console.log("old value ", this.props.viewConfig[name]);
+    console.log("new Value ", !this.props.viewConfig[name]);
+    let newConf = Object.assign({}, this.props.viewConfig);
+    newConf[name] = !newConf[name];
+    this.props.changeDashboardView(newConf);
+  };
   render() {
     const { open } = this.state;
     return (
       <DropButton
-        open={open}
-        onClose={() => this.setState({ open: false })}
-        onOpen={() => this.setState({ open: true })}
         icon={<SettingsOption />}
         dropAlign={{ top: "bottom", right: "right" }}
         dropContent={
-          <Box gap="10px" background="dark-3" direction="column">
+          <Box gap="10px" background="light-3" direction="column">
             <Box pad="small">
               <Typography variant="h6">Dashboard View</Typography>
             </Box>
             <Box direction="column">
-              {/* <Box direction="row">
-                <Typography>Sort card by project</Typography>
-                <Checkbox
-                  checked={this.props.viewConfig.sortByProject}
-                  value="checkedB"
-                  color="primary"
-                />
-              </Box>
-              <Box direction="row">
-                <Typography>highlight timeout card</Typography>
-                <Checkbox
-                  checked={this.props.viewConfig.timeout}
-                  value="true"
-                  color="primary"
-                />
-              </Box>
-              <Box direction="row">
-                <Typography>highlight sooner card</Typography>
-                <Checkbox
-                  checked={this.props.viewConfig.sooner}
-                  value="checkedB"
-                  color="primary"
-                />
-                <Input
-                  value={this.props.viewConfig.soonerTime}
-                  inputProps={{
-                    "aria-label": "sooner time"
-                  }}
-                />
-              </Box>
-              <Box direction="row">
-                <Typography>highlight closed card</Typography>
-                <Checkbox
-                  checked={this.props.viewConfig.closed}
-                  value="checkedB"
-                  color="primary"
-                />
-              </Box> */}
               <List>
-                <ListItem role={undefined} dense button>
+                <ListItem
+                  role={undefined}
+                  dense
+                  button
+                  onClick={this.handlerChange("sortByProject")}>
                   <Checkbox
                     checked={this.props.viewConfig.sortByProject}
                     tabIndex={-1}
+                    name="sortByProject"
                   />
                   <ListItemText primary="Sort card by projects (regroup)" />
                 </ListItem>
-                <ListItem role={undefined} dense button>
+                <ListItem
+                  role={undefined}
+                  dense
+                  button
+                  onClick={this.handlerChange("timeout")}>
                   <Checkbox
                     checked={this.props.viewConfig.timeout}
                     tabIndex={-1}
+                    name="timeout"
                   />
                   <ListItemText primary="highlight timeout card's" />
                 </ListItem>
-                <ListItem role={undefined} dense button>
+                <ListItem
+                  role={undefined}
+                  dense
+                  button
+                  onClick={this.handlerChange("sooner")}>
                   <Checkbox
                     checked={this.props.viewConfig.sooner}
                     tabIndex={-1}
+                    name="sooner"
                   />
                   <ListItemText primary="highlight sooner cards" />
                 </ListItem>
-                <ListItem role={undefined} dense button>
+                <ListItem
+                  role={undefined}
+                  dense
+                  button
+                  onClick={this.handlerChange("closed")}>
                   <Checkbox
                     checked={this.props.viewConfig.closed}
                     tabIndex={-1}
+                    name="closed"
                   />
                   <ListItemText primary="highlight closed cards" />
                 </ListItem>
@@ -128,7 +116,10 @@ const mapStateToProps = (state: any) => {
 };
 
 const mapDispatchToProps = (dispatch: any) => {
-  return null;
+  return {
+    changeDashboardView: (viewData: any) =>
+      dispatch(changeDashboardView(viewData))
+  };
 };
 
 export default connect(

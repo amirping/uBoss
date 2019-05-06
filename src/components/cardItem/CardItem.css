@@ -22,18 +22,14 @@
     margin-bottom: auto;
 }
 
-/* .date::before {
-    content: '⏰ '
-} */
-
-.label-red {
-    background: #f03434;
+.sooner {
+    background: #FB8C00 !important;
 }
 
-.label-green {
-    background: #3fc380;
+.timeout {
+    background: #e53935 !important;
 }
 
-.label-blue {
-    background: #1e8bc3;
+.closed {
+    background: #4CAF50 !important;
 }

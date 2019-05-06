@@ -24,20 +24,6 @@ export default function dashboards(state: any = dashboardsState, action: any) {
     });
   }
   if (action.type === Types.LOAD_DASHBOARD_SUCCESS) {
-    // create the cards holder in the store
-    // let cardsSkull: any = {};
-    // Object.keys(action.payload.lists).map((idLis: any) => {
-    //   cardsSkull[idLis] = {};
-    //   console.log("still up");
-    // });
-    // action.payload.importedDashboards.map((impDash: any) => {
-    //   const mappedListsKeys = Object.keys(impDash.mappedLists);
-    //   mappedListsKeys.map((key: any) => {
-    //     const mpList = impDash.mappedLists[key];
-    //     cardsSkull[mpList.idlistLocal][impDash.remote_board_id] = [1, 2, 3];
-    //     console.log("still working");
-    //   });
-    // });
     const cardsSkull: any = Object.keys(action.payload.lists).reduce(
       (acc, idList) => ({ ...acc, [idList]: {} }),
       {}
@@ -182,6 +168,12 @@ export default function dashboards(state: any = dashboardsState, action: any) {
     action.payload.comments = comments;
     return Object.assign({}, state, {
       moreCardData: action.payload
+    });
+  }
+  if (action.type === Types.DASHBOARD_VIEW_CHANGE) {
+    let viewChange = action.payload;
+    return Object.assign({}, state, {
+      viewConfig: viewChange
     });
   }
   return state;

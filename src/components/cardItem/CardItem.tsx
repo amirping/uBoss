@@ -8,18 +8,25 @@ import styled from "styled-components";
 import "./CardItem.css";
 import { Provider, connect } from "react-redux";
 import { selectCard } from "../../actions/dashboards";
+import CardData from "../cardData/CardData";
 const Item: any = styled.div``;
 export interface CardItemState {
   cardData: {};
 }
 
 class CardItem extends Component<any, CardItemState> {
+  classCss = "";
   constructor(props: any) {
     super(props);
   }
   openCardData = () => {
     this.props.selectCard(this.props.cardData);
   };
+  componentWillReceiveProps() {
+    // depand on card data pick css class
+    // cardData.closed
+    // CardData.dueComplete -> false -> due != Date()
+  }
   render() {
     return (
       <Draggable draggableId={this.props.cardData.id} index={this.props.index}>
@@ -80,6 +87,11 @@ class CardItem extends Component<any, CardItemState> {
     );
   }
 }
+const mapStateToProps = (state: any) => {
+  return {
+    viewConfig: state.dashboards.viewConfig
+  };
+};
 
 const mapDispatchToProps = (dispatch: any) => {
   return {
@@ -88,6 +100,6 @@ const mapDispatchToProps = (dispatch: any) => {
 };
 
 export default connect(
-  null,
+  mapStateToProps,
   mapDispatchToProps
 )(CardItem);

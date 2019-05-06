@@ -198,3 +198,6 @@ export function setingSelectedCard(card: any) {
 export function unsetSelectedCard() {
   return { type: Types.SELECTED_CARD_UNSET };
 }
+export function changeDashboardView(viewData: any) {
+  return { type: Types.DASHBOARD_VIEW_CHANGE, payload: viewData };
+}
