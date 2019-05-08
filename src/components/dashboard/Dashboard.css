@@ -30,3 +30,18 @@
 .sideMedia {
     width: 140px;
 }
+
+.searchInput {
+    width: 120px;
+    transition: 300ms all;
+}
+
+.searchInput:hover {
+    width: 150px;
+    transition: all 300ms;
+}
+
+.searchInput:focus {
+    width: 150px;
+    transition: all 300ms;
+}

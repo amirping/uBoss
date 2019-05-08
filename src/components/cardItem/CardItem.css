@@ -23,13 +23,16 @@
 }
 
 .sooner {
-    background: #FB8C00 !important;
+    background: rgba(251, 138, 0, 0.863) !important;
+    transition: all 300ms;
 }
 
 .timeout {
-    background: #e53935 !important;
+    background: #e53835c5 !important;
+    transition: all 300ms;
 }
 
 .closed {
-    background: #4CAF50 !important;
+    background: rgba(76, 175, 79, 0.856) !important;
+    transition: all 300ms;
 }

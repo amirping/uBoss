@@ -154,3 +154,9 @@ export function cardLoadMoreDataSuccess(payload: any) {
     payload: payload
   };
 }
+export function searchCard(payload: any) {
+  return {
+    type: Types.SEARCH_CARD_SET,
+    payload: payload
+  };
+}

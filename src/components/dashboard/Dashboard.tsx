@@ -1,6 +1,12 @@
 import React, { Component } from "react";
 import { Box, Text, Paragraph } from "grommet";
-import { CircularProgress } from "@material-ui/core";
+import {
+  CircularProgress,
+  Paper,
+  InputBase,
+  IconButton,
+  Divider
+} from "@material-ui/core";
 import "./Dashboard.css";
 import img_Bosst from "./animat-rocket-color.gif";
 import ListItem from "../list/ListItem";
@@ -14,6 +20,9 @@ import { DragDropContext } from "react-beautiful-dnd";
 import { closeCardData } from "../../actions/view";
 import CardData from "../cardData/CardData";
 import ViewConfig from "../viewConfig/ViewConfig";
+import SearchIcon from "@material-ui/icons/Search";
+import ClearIcon from "@material-ui/icons/Clear";
+import BarChart from "@material-ui/icons/BarChart";
 export interface DashboardProps {}
 
 export interface DashboardState {
@@ -21,18 +30,29 @@ export interface DashboardState {
 }
 
 class Dashboard extends Component<any, DashboardState> {
-  _cardsData: any = [];
+  _cardsData: any = []; // no need
+  inputSearch: any;
+  chartsOn = false;
   constructor(props: any) {
     super(props);
-    console.log("start");
-
-    this.state = {
-      cardsData: []
-    };
+    this.inputSearch = React.createRef();
   }
   componentDidMount() {
-    console.log("mounted");
+    console.log("mounted dashboard");
   }
+  handleClear = () => {
+    this.inputSearch.current.value = "";
+    this.props.actions_card.searchCard(this.inputSearch.current.value);
+  };
+  handleSearch = () => {
+    this.props.actions_card.searchCard(this.inputSearch.current.value);
+  };
+  // handleSearchChange = (ev: any) => {
+  //   this.searchString = ev.target.value;
+  // };
+  /**
+   * cardsLoader off -> we use redux now to get cards
+   */
   cardsLoader = () => {
     if (this.props.dashboard_data != undefined && this.props.dashboard_data) {
       Object.keys(this.props.dashboard_data.lists).map(key => {
@@ -146,6 +166,21 @@ class Dashboard extends Component<any, DashboardState> {
     }
     return remoteListID;
   };
+  /**
+   * used for search
+   */
+  cardsFilter = (intialData: any) => {
+    Object.keys(intialData).map((remoteId: any) => {
+      const remoteCards: Array<any> = intialData[remoteId];
+      let retData = remoteCards.filter((card: any) =>
+        card.name.includes(this.inputSearch.current.value)
+      );
+      console.log(retData);
+      intialData[remoteId] = retData;
+    });
+    // console.log(intialData);
+    return intialData;
+  };
   onDragStart = () => {
     // TODO: render again
   };
@@ -180,6 +215,11 @@ class Dashboard extends Component<any, DashboardState> {
   onBeforeDragStart = () => {
     // TODO: render again
   };
+  toogleCharts = () => {
+    console.log("charts change view");
+    console.log("new Value :", !this.chartsOn);
+    this.chartsOn = !this.chartsOn;
+  };
   DashRender = () => {
     return (
       <Box direction="column" fill>
@@ -196,29 +236,71 @@ class Dashboard extends Component<any, DashboardState> {
             </Text>
             <DashboardConfig />
           </Box>
-          <ViewConfig />
-        </Box>
-        <DragDropContext
-          onDragStart={this.onDragStart}
-          onDragEnd={this.onDragEnd}>
-          <Box
-            className="dash-lists"
-            direction="row"
-            justify="start"
-            align="start"
-            id="dash-lists"
-            pad="small"
-            gap="20px"
-            fill>
-            {Object.keys(this.props.dashboard_data.lists).map((listID: any) => (
-              <ListItem
-                key={listID}
-                listData={this.props.dashboard_data.lists[listID]}
-                cards={this.props.cards[listID]}
-              />
-            ))}
+          <Box direction="row">
+            <Box
+              direction="row"
+              background="dark-3"
+              round="xsmall"
+              pad={{ left: "3px" }}>
+              <Box direction="column" align="center" justify="center">
+                <InputBase
+                  className="searchInput"
+                  placeholder="Search for cards"
+                  inputRef={this.inputSearch}
+                />
+              </Box>
+              <Box direction="column" align="center" justify="center">
+                <IconButton aria-label="Search" onClick={this.handleSearch}>
+                  <SearchIcon />
+                </IconButton>
+              </Box>
+              <Box direction="column" align="center" justify="center">
+                <IconButton
+                  color="primary"
+                  aria-label="Directions"
+                  onClick={this.handleClear}>
+                  <ClearIcon />
+                </IconButton>
+              </Box>
+            </Box>
+            <Box direction="column" align="center" justify="center">
+              <ViewConfig />
+            </Box>
+            <Box direction="column" align="center" justify="center">
+              <IconButton aria-label="Directions" onClick={this.toogleCharts}>
+                <BarChart />
+              </IconButton>
+            </Box>
           </Box>
-        </DragDropContext>
+        </Box>
+        {this.chartsOn ? (
+          <Box>Charts here</Box>
+        ) : (
+          <DragDropContext
+            onDragStart={this.onDragStart}
+            onDragEnd={this.onDragEnd}>
+            <Box
+              className="dash-lists"
+              direction="row"
+              justify="start"
+              align="start"
+              id="dash-lists"
+              pad="small"
+              gap="20px"
+              fill>
+              {Object.keys(this.props.dashboard_data.lists).map(
+                (listID: any) => (
+                  <ListItem
+                    key={listID}
+                    listData={this.props.dashboard_data.lists[listID]}
+                    cards={this.cardsFilter(this.props.cards[listID])}
+                    // cards={this.cardsFilter(this.props.cards[listID])} // old search method
+                  />
+                )
+              )}
+            </Box>
+          </DragDropContext>
+        )}
       </Box>
     );
   };

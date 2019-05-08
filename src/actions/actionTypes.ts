@@ -73,3 +73,7 @@ export const LOAD_MORE_CARD_DATA_ERROR = "LOAD_MORE_CARD_DATA_ERROR";
  * dashboard View
  */
 export const DASHBOARD_VIEW_CHANGE = "DASHBOARD_VIEW_CHANGE";
+/**
+ * search cards
+ */
+export const SEARCH_CARD_SET = "SEARCH_CARD_SET";

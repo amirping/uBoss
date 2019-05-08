@@ -171,9 +171,17 @@ export default function dashboards(state: any = dashboardsState, action: any) {
     });
   }
   if (action.type === Types.DASHBOARD_VIEW_CHANGE) {
-    let viewChange = action.payload;
+    let viewChange = Object.assign({}, action.payload);
+    console.log("we are about to change ");
+    console.log(viewChange);
     return Object.assign({}, state, {
       viewConfig: viewChange
+    });
+  }
+  if (action.type === Types.SEARCH_CARD_SET) {
+    console.log("seeting up search string with value :", action.payload);
+    return Object.assign({}, state, {
+      searchCard: action.payload
     });
   }
   return state;

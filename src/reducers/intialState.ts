@@ -9,6 +9,7 @@ export default {
     moreCardData: null,
     selectedDashboardData: null,
     cards: null,
+    searchCard:"",
     viewConfig: {
       sortByProject: false,
       timeout: false,
