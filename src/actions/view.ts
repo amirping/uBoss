@@ -26,3 +26,6 @@ export function closeCardData() {
 export function openCardData() {
   return { type: Types.CARD_DATA_OPEN };
 }
+export function toogleStatsView() {
+  return { type: Types.TOOGLE_STATS_VIEW };
+}

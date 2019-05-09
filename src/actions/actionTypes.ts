@@ -77,3 +77,4 @@ export const DASHBOARD_VIEW_CHANGE = "DASHBOARD_VIEW_CHANGE";
  * search cards
  */
 export const SEARCH_CARD_SET = "SEARCH_CARD_SET";
+export const TOOGLE_STATS_VIEW = "TOOGLE_STATS_VIEW";

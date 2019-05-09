@@ -47,5 +47,10 @@ export default function auth(state = initialState.view, action: any) {
       cardData: false
     });
   }
+  if (action.type === Types.TOOGLE_STATS_VIEW) {
+    return Object.assign({}, state, {
+      statsView: !state.statsView
+    });
+  }
   return state;
 }

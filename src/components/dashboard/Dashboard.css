@@ -3,6 +3,10 @@
     overflow: visible;
 }
 
+.chartsCard {
+    min-width: 500px;
+}
+
 .list-main {
     min-width: 290px !important;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.20);

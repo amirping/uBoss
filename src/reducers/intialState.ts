@@ -9,7 +9,7 @@ export default {
     moreCardData: null,
     selectedDashboardData: null,
     cards: null,
-    searchCard:"",
+    searchCard: "",
     viewConfig: {
       sortByProject: false,
       timeout: false,
@@ -27,7 +27,8 @@ export default {
     userProfile_anchorEl: null,
     dashboardCreator: false,
     dashboardConfig: false,
-    cardData: false
+    cardData: false,
+    statsView: false
   },
   auth: {
     connected: !!localStorage.getItem("token"),
