@@ -6,3 +6,6 @@ export const shortName = (name: string, length?: number) => {
   });
   return Sname;
 };
+export const datediff = (first: any, second: any) => {
+  return Math.round((second - first) / (1000 * 60 * 60 * 24));
+};

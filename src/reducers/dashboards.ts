@@ -1,5 +1,6 @@
 import * as Types from "../actions/actionTypes";
 import intialState from "./intialState";
+import { datediff } from "../utils";
 let dashboardsState = {};
 Object.assign(
   dashboardsState,
@@ -119,7 +120,74 @@ export default function dashboards(state: any = dashboardsState, action: any) {
     });
   }
   if (action.type === Types.LOAD_CARDS_SUCCESS) {
-    return { ...state, cards: action.payload };
+    // gather stats from cards
+    // due - dueComplete - closed
+    let _stats: any = {
+      closed: 0,
+      open: 0,
+      sooner: 0,
+      outOftime: 0,
+      closed_Cards: <any>[],
+      open_Cards: <any>[],
+      sooner_Cards: <any>[],
+      outOftime_Cards: <any>[],
+      cardsBylist: <any>[],
+      cardsByboard: <any>[]
+    };
+    let cardsByList: any = {};
+    let cardsByBoard: any = {};
+    Object.keys(action.payload).map(l => {
+      const list = action.payload[l];
+      cardsByList[l] = 0;
+      Object.keys(list).map(ar => {
+        const arr = list[ar];
+        arr.map((item: any) => {
+          cardsByList[l]++;
+          if (cardsByBoard[item.idBoard]) {
+            cardsByBoard[item.idBoard]++;
+          } else {
+            cardsByBoard[item.idBoard] = 1;
+          }
+          if (item.closed || item.dueComplete != false) {
+            _stats.closed++;
+            _stats.closed_Cards.push(item);
+          } else if (item.due) {
+            const today = new Date();
+            const iDate = new Date(item.due);
+            if (iDate < today) {
+              _stats.outOftime++;
+              _stats.outOftime_Cards.push(item);
+            } else if (
+              Math.abs(datediff(iDate, today)) <= state.viewConfig.soonerTime
+            ) {
+              _stats.sooner++;
+              _stats.sooner_Cards.push(item);
+            } else {
+              _stats.open++;
+              _stats.open_Cards.push(item);
+            }
+          } else {
+            _stats.open++;
+            _stats.open_Cards.push(item);
+          }
+        });
+      });
+    });
+    Object.keys(cardsByList).map(k => {
+      _stats.cardsBylist.push({
+        id: state.selectedDashboardData.lists[k].name,
+        total: cardsByList[k]
+      });
+    });
+    Object.keys(cardsByBoard).map(k => {
+      _stats.cardsByboard.push({ id: k, total: cardsByBoard[k] });
+    });
+    // finish
+    return Object.assign({}, state, {
+      cards: action.payload,
+      stats: _stats
+    });
+    // return { ...state, cards: action.payload }; -> remove for optimi
   }
   if (action.type === Types.UPDATE_CARD_SUCCESS) {
     console.log("updating state");

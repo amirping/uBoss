@@ -6,6 +6,7 @@ import ImportedDashboardApi from "../api/importedDashboardApi";
 /**
  *
  * @param dashboardData the same data that the dashboard have
+ * @note this function need to be optmized , we need to run all the request and once we are done w dispatch !!!!!
  */
 export function loadCards(dashboard_data: any) {
   let jobTodo = 0;
@@ -51,7 +52,7 @@ export function loadCards(dashboard_data: any) {
                 ImportedDash.remote_board_id
               ].concat(result);
               //console.log(_cardsData);
-              if (jobDone === jobTodo) {
+              if (jobDone >= jobTodo) {
                 // safe update
                 setTimeout(() => {
                   dispatch(cardsLoadedSuccess(_cardsData));
@@ -61,6 +62,7 @@ export function loadCards(dashboard_data: any) {
           })
           .catch(err => {
             console.log(err);
+            jobTodo--;
           });
       });
     });

@@ -37,6 +37,7 @@ import {
   Pie,
   Sector
 } from "recharts";
+import Stats from "../stats/Stats";
 export interface DashboardProps {}
 
 export interface DashboardState {
@@ -231,103 +232,8 @@ class Dashboard extends Component<any, DashboardState> {
   toogleCharts = () => {
     this.props.toogleStatsView();
   };
-  renderActiveShape = (props: any) => {
-    const RADIAN = Math.PI / 180;
-    const {
-      cx,
-      cy,
-      midAngle,
-      innerRadius,
-      outerRadius,
-      startAngle,
-      endAngle,
-      fill,
-      payload,
-      percent,
-      value
-    } = props;
-    const sin = Math.sin(-RADIAN * midAngle);
-    const cos = Math.cos(-RADIAN * midAngle);
-    const sx = cx + (outerRadius + 10) * cos;
-    const sy = cy + (outerRadius + 10) * sin;
-    const mx = cx + (outerRadius + 30) * cos;
-    const my = cy + (outerRadius + 30) * sin;
-    const ex = mx + (cos >= 0 ? 1 : -1) * 22;
-    const ey = my;
-    const textAnchor = cos >= 0 ? "start" : "end";
 
-    return (
-      <g>
-        <text x={cx} y={cy} dy={8} textAnchor="middle" fill={fill}>
-          {payload.name}
-        </text>
-        <Sector
-          cx={cx}
-          cy={cy}
-          innerRadius={innerRadius}
-          outerRadius={outerRadius}
-          startAngle={startAngle}
-          endAngle={endAngle}
-          fill={fill}
-        />
-        <Sector
-          cx={cx}
-          cy={cy}
-          startAngle={startAngle}
-          endAngle={endAngle}
-          innerRadius={outerRadius + 6}
-          outerRadius={outerRadius + 10}
-          fill={fill}
-        />
-        <path
-          d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`}
-          stroke={fill}
-          fill="none"
-        />
-        <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none" />
-        <text
-          x={ex + (cos >= 0 ? 1 : -1) * 12}
-          y={ey}
-          textAnchor={textAnchor}
-          fill="#333">{`PV ${value}`}</text>
-        <text
-          x={ex + (cos >= 0 ? 1 : -1) * 12}
-          y={ey}
-          dy={18}
-          textAnchor={textAnchor}
-          fill="#999">
-          {`(Rate ${(percent * 100).toFixed(2)}%)`}
-        </text>
-      </g>
-    );
-  };
   DashRender = () => {
-    const data01 = [
-      {
-        name: "Group A",
-        value: 400
-      },
-      {
-        name: "Group B",
-        value: 300
-      },
-      {
-        name: "Group C",
-        value: 300
-      },
-      {
-        name: "Group D",
-        value: 200
-      },
-      {
-        name: "Group E",
-        value: 278
-      },
-      {
-        name: "Group F",
-        value: 189
-      }
-    ];
     return (
       <Box direction="column" fill>
         <Box
@@ -381,59 +287,7 @@ class Dashboard extends Component<any, DashboardState> {
           </Box>
         </Box>
         {this.props.statsView ? (
-          <Box direction="column" fill animation="fadeIn">
-            <Box>
-              <Typography variant="h5">Dashboard Stats</Typography>
-            </Box>
-            <Box direction="column">
-              <Typography variant="h5">Card's Stats</Typography>
-              <Box direction="row">
-                <PieChart width={730} height={250}>
-                  <Pie
-                    data={data01}
-                    dataKey="value"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={50}
-                    fill="#8884d8"
-                  />
-                  <Pie
-                    data={data02}
-                    dataKey="value"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
-                    fill="#82ca9d"
-                    label
-                  />
-                </PieChart>
-                <PieChart width={400} height={400}>
-                  <Pie
-                    activeIndex={1}
-                    activeShape={this.renderActiveShape}
-                    data={data01}
-                    cx={200}
-                    cy={200}
-                    innerRadius={60}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                  />
-                </PieChart>
-              </Box>
-            </Box>
-            <Box direction="column">
-              <Typography variant="h5">Boards's Stats</Typography>
-              <Box direction="row-responsive" />
-            </Box>
-            <Box direction="column">
-              <Typography variant="h5">General Stats</Typography>
-              <Box direction="row-responsive" />
-            </Box>
-          </Box>
+          <Stats />
         ) : (
           <DragDropContext
             onDragStart={this.onDragStart}
@@ -452,7 +306,7 @@ class Dashboard extends Component<any, DashboardState> {
                   <ListItem
                     key={listID}
                     listData={this.props.dashboard_data.lists[listID]}
-                    cards={this.cardsFilter(this.props.cards[listID])}
+                    cards={this.props.cards[listID]}
                     // cards={this.cardsFilter(this.props.cards[listID])} // old search method
                   />
                 )
@@ -526,7 +380,8 @@ const mapStateToProps = (state: any) => {
     user: state.auth.user,
     cardDataDialog: state.view.cardData,
     statsView: state.view.statsView,
-    selectedCard: state.dashboards.selectedCard
+    selectedCard: state.dashboards.selectedCard,
+    stats: state.dashboards.stats
   };
 };
 

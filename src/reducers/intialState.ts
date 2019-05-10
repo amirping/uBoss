@@ -10,12 +10,13 @@ export default {
     selectedDashboardData: null,
     cards: null,
     searchCard: "",
+    stats: null,
     viewConfig: {
       sortByProject: false,
       timeout: false,
       sooner: false,
       closed: false,
-      soonerTime: 1
+      soonerTime: 2
     }
   },
   dashboardTocreate: {
