@@ -18,7 +18,12 @@ import {
   Legend,
   Line,
   YAxis,
-  ResponsiveContainer
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  Cell,
+  AreaChart,
+  Area
 } from "recharts";
 
 export interface StatsProps {}
@@ -109,8 +114,13 @@ class Stats extends Component<any, StatsState> {
   };
   render() {
     return (
-      <Box direction="column" fill animation="fadeIn" overflow="auto">
-        <Box direction="column" fill="horizontal">
+      <Box
+        direction="column"
+        fill
+        animation="fadeIn"
+        pad="xsmall"
+        overflow="auto">
+        <Box direction="column" height="300px" fill="horizontal">
           <Box>
             <Typography variant="h5">Global Card's Stats</Typography>
           </Box>
@@ -152,10 +162,10 @@ class Stats extends Component<any, StatsState> {
         </Box>
         <Box direction="column">
           <Typography variant="h5">Boards Stats</Typography>
-          <Box direction="row-responsive">
-            <Box direction="column" flex>
+          <Box direction="row-responsive" height="400px">
+            <Box direction="column" height="350px" flex>
               <ResponsiveContainer height={300}>
-                <LineChart
+                {/* <LineChart
                   data={this.props.stats.cardsBylist}
                   margin={{
                     top: 5,
@@ -164,8 +174,8 @@ class Stats extends Component<any, StatsState> {
                     bottom: 5
                   }}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="id" />
-                  <YAxis />
+                  <XAxis dataKey="id" stroke="#ffffff" />
+                  <YAxis stroke="#ffffff" />
                   <Tooltip />
                   <Legend />
                   <Line
@@ -174,12 +184,27 @@ class Stats extends Component<any, StatsState> {
                     stroke="#8884d8"
                     activeDot={{ r: 8 }}
                   />
-                </LineChart>
+                </LineChart> */}
+                <BarChart
+                  data={this.props.stats.cardsBylist}
+                  margin={{
+                    top: 5,
+                    right: 30,
+                    left: 20,
+                    bottom: 5
+                  }}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="id" stroke="#ffffff" label="list" />
+                  <YAxis stroke="#ffffff" label="cards number" />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="total" fill="#8884d8" label maxBarSize={20} />
+                </BarChart>
               </ResponsiveContainer>
             </Box>
-            <Box direction="column" flex>
+            <Box direction="column" height="350px" flex>
               <ResponsiveContainer height={300}>
-                <LineChart
+                {/* <LineChart
                   data={this.props.stats.cardsByboard}
                   margin={{
                     top: 5,
@@ -198,14 +223,81 @@ class Stats extends Component<any, StatsState> {
                     stroke="#8884d8"
                     activeDot={{ r: 8 }}
                   />
-                </LineChart>
+                </LineChart> */}
+                <BarChart
+                  data={this.props.stats.cardsByboard}
+                  margin={{
+                    top: 5,
+                    right: 30,
+                    left: 20,
+                    bottom: 5
+                  }}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="id" stroke="#ffffff" label="Board ID" />
+                  <YAxis stroke="#ffffff" label="cards number" />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="total" fill="#8884d8" label maxBarSize={20} />
+                </BarChart>
               </ResponsiveContainer>
+            </Box>
+          </Box>
+          {/* piechart for each Board (open,closed,sooner,out of time) */}
+          <Box direction="column" height="500px">
+            <Typography variant="headline">Cards stats by Board</Typography>
+            <Box
+              flex
+              direction="row-responsive"
+              fill="horizontal"
+              justify="between"
+              height="400px">
+              {this.props.stats.statsByBoards.map((x: any) => (
+                <Box direction="column">
+                  <Typography>Board: {x.id}</Typography>
+                  <ResponsiveContainer height={300}>
+                    <PieChart height={300}>
+                      <Tooltip />
+                      <Legend verticalAlign="bottom" height={36} />
+                      <Pie
+                        label
+                        data={x.data}
+                        dataKey="value"
+                        nameKey="name"
+                        outerRadius={80}
+                        fill="#8884d8">
+                        {x.data.map((entry: any, index: number) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                    </PieChart>
+                  </ResponsiveContainer>
+                </Box>
+              ))}
             </Box>
           </Box>
         </Box>
         <Box direction="column">
           <Typography variant="h5">General Stats</Typography>
-          <Box direction="row-responsive" />
+          <Box direction="row">
+            <ResponsiveContainer height={400}>
+              <AreaChart
+                height={400}
+                data={this.props.stats.lastActivityCards}
+                margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+                <XAxis dataKey="date" />
+                <YAxis />
+                <CartesianGrid strokeDasharray="3 3" />
+                <Tooltip />
+
+                <Area
+                  type="monotone"
+                  dataKey="activity"
+                  stroke="#8884d8"
+                  fill="#8884d8"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </Box>
         </Box>
       </Box>
     );

@@ -132,10 +132,13 @@ export default function dashboards(state: any = dashboardsState, action: any) {
       sooner_Cards: <any>[],
       outOftime_Cards: <any>[],
       cardsBylist: <any>[],
-      cardsByboard: <any>[]
+      cardsByboard: <any>[],
+      statsByBoards: <any>[],
+      lastActivityCards: <any>[]
     };
     let cardsByList: any = {};
     let cardsByBoard: any = {};
+    let activityByDate: any = {};
     Object.keys(action.payload).map(l => {
       const list = action.payload[l];
       cardsByList[l] = 0;
@@ -143,6 +146,11 @@ export default function dashboards(state: any = dashboardsState, action: any) {
         const arr = list[ar];
         arr.map((item: any) => {
           cardsByList[l]++;
+          if (activityByDate[item.dateLastActivity.substring(0, 10)]) {
+            activityByDate[item.dateLastActivity.substring(0, 10)]++;
+          } else {
+            activityByDate[item.dateLastActivity.substring(0, 10)] = 1;
+          }
           if (cardsByBoard[item.idBoard]) {
             cardsByBoard[item.idBoard]++;
           } else {
@@ -173,6 +181,9 @@ export default function dashboards(state: any = dashboardsState, action: any) {
         });
       });
     });
+    Object.keys(activityByDate).map(d => {
+      _stats.lastActivityCards.push({ date: d, activity: activityByDate[d] });
+    });
     Object.keys(cardsByList).map(k => {
       _stats.cardsBylist.push({
         id: state.selectedDashboardData.lists[k].name,
@@ -181,6 +192,29 @@ export default function dashboards(state: any = dashboardsState, action: any) {
     });
     Object.keys(cardsByBoard).map(k => {
       _stats.cardsByboard.push({ id: k, total: cardsByBoard[k] });
+    });
+    Object.keys(cardsByBoard).map(idBoard => {
+      // bad method here -- need opti
+      let open = _stats.open_Cards.filter((x: any) => x.idBoard === idBoard);
+      let closed = _stats.closed_Cards.filter(
+        (x: any) => x.idBoard === idBoard
+      );
+      let sooner = _stats.sooner_Cards.filter(
+        (x: any) => x.idBoard === idBoard
+      );
+      let out = _stats.outOftime_Cards.filter(
+        (x: any) => x.idBoard === idBoard
+      );
+      const item = {
+        id: idBoard,
+        data: [
+          { name: "open", value: open.length, color: "#3F51B5" },
+          { name: "closed", value: closed.length, color: "#4CAF50" },
+          { name: "sooner", value: sooner.length, color: "#F9A825" },
+          { name: "out of time", value: out.length, color: "#e53935" }
+        ]
+      };
+      _stats.statsByBoards.push(item);
     });
     // finish
     return Object.assign({}, state, {

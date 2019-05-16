@@ -17,7 +17,8 @@ export default {
       sooner: false,
       closed: false,
       soonerTime: 2
-    }
+    },
+    remoteBoards: {}
   },
   dashboardTocreate: {
     lists: []

@@ -8,6 +8,21 @@ import ImportedDashboardApi from "../api/importedDashboardApi";
  * @param dashboardData the same data that the dashboard have
  * @note this function need to be optmized , we need to run all the request and once we are done w dispatch !!!!!
  */
+
+/**
+  * SOlution come to my mind -- need to be tested
+  * const p1 = fetch(url,{
+          method: 'GET'
+        })
+const p2 = fetch(url2,{
+          method: 'GET'
+        })
+
+Promise.all([p1, p2]).then(values => { 
+// here you have an array of reponses
+  console.log(values);
+})
+  */
 export function loadCards(dashboard_data: any) {
   let jobTodo = 0;
   let jobDone = 0;
