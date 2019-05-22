@@ -86,9 +86,34 @@ export const signup = (user: any) => {
       });
   };
 };
-export function logout(payload: any) {
-  return { type: Types.LOGOUT, payload };
+
+export function logout(userToken: string, refreshToken: string) {
+  return function(dispatch: any) {
+    return authApi
+      .logout(userToken, refreshToken)
+      .then(response => {
+        localStorage.clear();
+        if (response.status === 200) {
+          dispatch(logoutSuccess());
+        } else {
+          dispatch(
+            logoutError({
+              code: response.status,
+              message: "Problem with our servers"
+            })
+          );
+        }
+      })
+      .catch(error => {
+        dispatch(netError(error));
+        throw error;
+      });
+  };
 }
-export function logoutSuccess(payload: any) {
-  return { type: Types.LOGOUT_SUCCESS, payload };
+
+export function logoutError(error: any) {
+  return { type: Types.LOGOUT_ERROR, error };
+}
+export function logoutSuccess() {
+  return { type: Types.LOGOUT_SUCCESS };
 }

@@ -49,6 +49,22 @@ export default function auth(state = authState, action: any) {
       user: JSON.parse(localStorage.getItem("user") || "null")
     });
   }
+  if (action.type === Types.LOGOUT_SUCCESS) {
+    return Object.assign({}, state, {
+      success: { id: "LOGOUT_USER" },
+      error: null,
+      user: null,
+      connected: false
+    });
+  }
+  if (action.type === Types.LOGOUT_ERROR) {
+    return Object.assign({}, state, {
+      success: null,
+      error: { id: "LOGOUT_USER", dettails: action.error },
+      user: null,
+      connected: false
+    });
+  }
   if (action.type === Types.UPDATE_USER_ERROR) {
     return Object.assign({}, state, {
       success: null,

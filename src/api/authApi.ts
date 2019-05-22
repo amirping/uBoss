@@ -32,4 +32,21 @@ export default class AuthApi {
         return error;
       });
   }
+  static logout(token: string, refreshToken: string) {
+    const request = new Request(this.API_URL + "logout", {
+      method: "POST",
+      headers: new Headers({
+        "Content-Type": "application/json",
+        AUTHORIZATION: `Bearer ${token}`,
+        refreshToken: `${refreshToken}`
+      })
+    });
+    return fetch(request)
+      .then(response => {
+        return response.json();
+      })
+      .catch(error => {
+        return error;
+      });
+  }
 }

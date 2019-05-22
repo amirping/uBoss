@@ -9,3 +9,5 @@ export const shortName = (name: string, length?: number) => {
 export const datediff = (first: any, second: any) => {
   return Math.round((second - first) / (1000 * 60 * 60 * 24));
 };
+export const supportedAccounts = ["trello"];
+export const accountsType = ["trello", "GitHub", "GitLab", "Jira"];

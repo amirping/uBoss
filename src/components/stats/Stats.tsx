@@ -2,21 +2,15 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Box } from "grommet";
 import { Typography } from "@material-ui/core";
+import "./Stats.css";
 import {
   PieChart,
   Pie,
   Sector,
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-  Radar,
-  LineChart,
   XAxis,
   CartesianGrid,
   Tooltip,
   Legend,
-  Line,
   YAxis,
   ResponsiveContainer,
   BarChart,
@@ -120,32 +114,37 @@ class Stats extends Component<any, StatsState> {
         animation="fadeIn"
         pad="xsmall"
         overflow="auto">
-        <Box direction="column" height="300px" fill="horizontal">
-          <Box>
-            <Typography variant="h5">Global Card's Stats</Typography>
-          </Box>
-          <Box direction="row">
-            <PieChart width={400} height={250}>
-              <Pie
-                activeIndex={this.state.activeIndex}
-                activeShape={this.renderActiveShape}
-                data={[
-                  { name: "Open Cards", value: this.props.stats.open },
-                  { name: "Closed cards", value: this.props.stats.closed },
-                  { name: "Sooner Cards", value: this.props.stats.sooner },
-                  {
-                    name: "Out of Time cards",
-                    value: this.props.stats.outOftime
-                  }
-                ]}
-                innerRadius={60}
-                outerRadius={80}
-                fill="#8884d8"
-                dataKey="value"
-                onMouseEnter={this.onPieEnter}
-              />
-            </PieChart>
-            <Box direction="column" justify="center">
+        {/* WOOOOO */}
+        <div className="statBox">
+          <Typography className="title" variant="h5">
+            Global Card's Stats
+          </Typography>
+          <div className="row-box">
+            <div className="stat">
+              <ResponsiveContainer height={250} width="50%">
+                <PieChart>
+                  <Pie
+                    activeIndex={this.state.activeIndex}
+                    activeShape={this.renderActiveShape}
+                    data={[
+                      { name: "Open Cards", value: this.props.stats.open },
+                      { name: "Closed cards", value: this.props.stats.closed },
+                      { name: "Sooner Cards", value: this.props.stats.sooner },
+                      {
+                        name: "Out of Time cards",
+                        value: this.props.stats.outOftime
+                      }
+                    ]}
+                    innerRadius={60}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                    onMouseEnter={this.onPieEnter}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="dsc">
               <Typography variant="body1">
                 This Pie chart, represente the global state of cards in all
                 projects. <br /> in Global this chart give you an idea about how
@@ -157,105 +156,77 @@ class Stats extends Component<any, StatsState> {
                 <li>Sooner Cards : {this.props.stats.sooner}</li>
                 <li>Out of Time cards : {this.props.stats.outOftime}</li>
               </ul>
-            </Box>
-          </Box>
-        </Box>
-        <Box direction="column">
-          <Typography variant="h5">Boards Stats</Typography>
-          <Box direction="row-responsive" height="400px">
-            <Box direction="column" height="350px" flex>
-              <ResponsiveContainer height={300}>
-                {/* <LineChart
-                  data={this.props.stats.cardsBylist}
-                  margin={{
-                    top: 5,
-                    right: 30,
-                    left: 20,
-                    bottom: 5
-                  }}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="id" stroke="#ffffff" />
-                  <YAxis stroke="#ffffff" />
-                  <Tooltip />
-                  <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="total"
-                    stroke="#8884d8"
-                    activeDot={{ r: 8 }}
-                  />
-                </LineChart> */}
-                <BarChart
-                  data={this.props.stats.cardsBylist}
-                  margin={{
-                    top: 5,
-                    right: 30,
-                    left: 20,
-                    bottom: 5
-                  }}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="id" stroke="#ffffff" label="list" />
-                  <YAxis stroke="#ffffff" label="cards number" />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="total" fill="#8884d8" label maxBarSize={20} />
-                </BarChart>
-              </ResponsiveContainer>
-            </Box>
-            <Box direction="column" height="350px" flex>
-              <ResponsiveContainer height={300}>
-                {/* <LineChart
-                  data={this.props.stats.cardsByboard}
-                  margin={{
-                    top: 5,
-                    right: 30,
-                    left: 20,
-                    bottom: 5
-                  }}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="id" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="total"
-                    stroke="#8884d8"
-                    activeDot={{ r: 8 }}
-                  />
-                </LineChart> */}
-                <BarChart
-                  data={this.props.stats.cardsByboard}
-                  margin={{
-                    top: 5,
-                    right: 30,
-                    left: 20,
-                    bottom: 5
-                  }}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="id" stroke="#ffffff" label="Board ID" />
-                  <YAxis stroke="#ffffff" label="cards number" />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="total" fill="#8884d8" label maxBarSize={20} />
-                </BarChart>
-              </ResponsiveContainer>
-            </Box>
-          </Box>
+            </div>
+          </div>
+        </div>
+        {/* WOOOOO */}
+        <div className="col-box">
+          <Typography variant="h5" className="title">
+            Boards Stats
+          </Typography>
+          <div className="row-box">
+            <div className="statBox">
+              <div className="stat ">
+                <Typography className="sub-title" variant="caption">
+                  Number of cards By list
+                </Typography>
+                <ResponsiveContainer height={250}>
+                  <BarChart
+                    data={this.props.stats.cardsBylist}
+                    margin={{
+                      top: 5,
+                      right: 30,
+                      left: 10,
+                      bottom: 5
+                    }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="id" stroke="#ffffff" />
+                    <YAxis stroke="#ffffff" />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="total" fill="#8884d8" label maxBarSize={20} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+            <div className="statBox">
+              <div className="stat ">
+                <Typography className="sub-title" variant="caption">
+                  Number of cards By Board
+                </Typography>
+                <ResponsiveContainer height={250}>
+                  <BarChart
+                    data={this.props.stats.cardsByboard}
+                    margin={{
+                      top: 5,
+                      right: 30,
+                      left: 10,
+                      bottom: 5
+                    }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="id" stroke="#ffffff" />
+                    <YAxis stroke="#ffffff" />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="total" fill="#8884d8" label maxBarSize={20} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
           {/* piechart for each Board (open,closed,sooner,out of time) */}
-          <Box direction="column" height="500px">
-            <Typography variant="headline">Cards stats by Board</Typography>
-            <Box
-              flex
-              direction="row-responsive"
-              fill="horizontal"
-              justify="between"
-              height="400px">
+          <div className="statBox">
+            <Typography className="title" variant="headline">
+              Cards stats by Board
+            </Typography>
+            <div className="row-box">
               {this.props.stats.statsByBoards.map((x: any) => (
-                <Box direction="column">
-                  <Typography>Board: {x.id}</Typography>
+                <div className="stat">
+                  <Typography variant="caption" className="sub-title">
+                    Board: {x.id}
+                  </Typography>
                   <ResponsiveContainer height={300}>
-                    <PieChart height={300}>
+                    <PieChart>
                       <Tooltip />
                       <Legend verticalAlign="bottom" height={36} />
                       <Pie
@@ -271,34 +242,41 @@ class Stats extends Component<any, StatsState> {
                       </Pie>
                     </PieChart>
                   </ResponsiveContainer>
-                </Box>
+                </div>
               ))}
-            </Box>
-          </Box>
-        </Box>
-        <Box direction="column">
-          <Typography variant="h5">General Stats</Typography>
-          <Box direction="row">
-            <ResponsiveContainer height={400}>
-              <AreaChart
-                height={400}
-                data={this.props.stats.lastActivityCards}
-                margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
-                <XAxis dataKey="date" />
-                <YAxis />
-                <CartesianGrid strokeDasharray="3 3" />
-                <Tooltip />
+            </div>
+          </div>
+        </div>
 
-                <Area
-                  type="monotone"
-                  dataKey="activity"
-                  stroke="#8884d8"
-                  fill="#8884d8"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </Box>
-        </Box>
+        <div className="statBox">
+          <Typography variant="h5" className="title">
+            General Stats
+          </Typography>
+          <Typography variant="caption" className="sub-title">
+            Activity on cards by date
+          </Typography>
+          <div className="row-box">
+            <div className="stat">
+              <ResponsiveContainer height={400}>
+                <AreaChart
+                  data={this.props.stats.lastActivityCards}
+                  margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+                  <XAxis dataKey="date" />
+                  <YAxis />
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <Tooltip />
+
+                  <Area
+                    type="monotone"
+                    dataKey="activity"
+                    stroke="#8884d8"
+                    fill="#8884d8"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
       </Box>
     );
   }
@@ -307,10 +285,6 @@ const mapStateToProps = (state: any) => {
   return {
     stats: state.dashboards.stats
   };
-};
-
-const mapDispatchToProps = (dispatch: any) => {
-  return null;
 };
 
 export default connect(

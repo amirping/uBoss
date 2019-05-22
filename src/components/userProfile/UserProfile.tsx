@@ -11,18 +11,30 @@ import {
   Menu,
   MenuItem,
   Avatar,
-  Divider
+  Divider,
+  Typography,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  ListItemSecondaryAction
 } from "@material-ui/core";
-import { Form, Box, Text } from "grommet";
+import { Form, Box, Text, Tabs, Tab } from "grommet";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import "./UserProfile.css";
 import { connect } from "react-redux";
+import DeleteIcon from "@material-ui/icons/Delete";
 import {
   openProfileManagement,
   closeProfileManagement
 } from "../../actions/view";
 import * as userActions from "../../actions/user";
+import { startApproveAccount, endApproveAccount } from "../../actions/user";
 import { bindActionCreators } from "redux";
+import { supportedAccounts, accountsType } from "../../utils";
+import userApi from "../../api/userApi";
+import { logout } from "../../actions/auth";
+import TrelloApi from "../../api/trelloApi";
 export interface UserProfileProps {}
 
 export interface UserProfileState {
@@ -38,12 +50,14 @@ class UserProfile extends Component<any, UserProfileState> {
     new_password_confirmation: ""
   };
   _token: any;
+  _refreshToken: any;
   constructor(props: any) {
     super(props);
     this.state = { anchorEl: null };
   }
   componentDidMount() {
     this._token = localStorage.getItem("token");
+    this._refreshToken = localStorage.getItem("refreshToken");
   }
   handleClick = (event: any) => {
     this.setState({ anchorEl: event.currentTarget });
@@ -88,9 +102,42 @@ class UserProfile extends Component<any, UserProfileState> {
     this.props.actions.loadUser(user);
     this.props.openProfileManagement();
   };
+  logout = () => {
+    this.props.logout(this._token, this._refreshToken);
+  };
   _handleFormFieldChange = (event: any) => {
     this._userForm[event.target.name] = event.target.value;
     console.log(this._userForm);
+  };
+  connectTrello = () => {
+    userApi
+      .connectTrello(this._token, this.props.user)
+      .then((data: any) => {
+        console.log(data);
+        this.props.startApprove();
+        //self.props.endApproveAccount();
+        let _user = JSON.parse(localStorage.getItem("user") || "");
+        _user.token = this._token;
+        window.open(data.link, "_blank");
+        let inter = setInterval(() => {
+          // if endApprovingAction fired -> update the current user -> set approvingaction & end approvingAction to false / null
+          let endFired = localStorage.getItem("endApprovingAction");
+          console.log("still watching");
+          if (endFired && endFired === "true") {
+            console.log("it's over let's update our state here");
+            clearInterval(inter);
+            /**
+             * update user in state -> reset approving
+             */
+            userActions.approveActionReset();
+            this.props.userActions.loadUser(_user);
+          }
+        }, 5000);
+      })
+      .catch((error: any) => {
+        console.log(error);
+        alert("please check your internet access");
+      });
   };
   render() {
     const { anchorEl } = this.state;
@@ -108,7 +155,7 @@ class UserProfile extends Component<any, UserProfileState> {
           open={Boolean(anchorEl)}
           onClose={this.handleClose}>
           <MenuItem onClick={this.openUserProfile}>My account</MenuItem>
-          <MenuItem onClick={this.handleClose}>Logout</MenuItem>
+          <MenuItem onClick={this.logout}>Logout</MenuItem>
         </Menu>
         <Dialog
           fullWidth={true}
@@ -162,93 +209,187 @@ class UserProfile extends Component<any, UserProfileState> {
                 </Text>
               </Box>
             )}
-            <Box direction="column" fill>
-              <Box direction="row-responsive" fill justify="between" gap="30px">
-                <Box direction="column" flex>
-                  <Form onSubmit={this.updateUserIfno}>
+            <Box direction="column" fill background="light-0">
+              <Tabs>
+                <Tab title="Profile data">
+                  <Box
+                    direction="row-responsive"
+                    fill
+                    justify="between"
+                    gap="30px">
                     <Box direction="column" flex>
-                      <TextField
-                        id="name"
-                        label="Name"
-                        defaultValue={this.props.user.name}
-                        margin="normal"
-                        variant="outlined"
-                        required
-                        placeholder="Your name"
-                        autoFocus={true}
-                        helperText="change your name !"
-                        name="name"
-                        onChange={this._handleFormFieldChange}
-                      />
-                      <TextField
-                        id="email"
-                        label="Email"
-                        defaultValue={this.props.user.email}
-                        margin="normal"
-                        variant="outlined"
-                        required
-                        placeholder="Give your email"
-                        helperText="change your email"
-                        name="email"
-                        type="email"
-                        onChange={this._handleFormFieldChange}
-                      />
-                      <Button variant="outlined" color="primary" type="submit">
-                        Save Changes
-                      </Button>
+                      <Form onSubmit={this.updateUserIfno}>
+                        <Box direction="column" flex>
+                          <TextField
+                            id="name"
+                            label="Name"
+                            defaultValue={this.props.user.name}
+                            margin="normal"
+                            variant="outlined"
+                            required
+                            placeholder="Your name"
+                            autoFocus={true}
+                            helperText="change your name !"
+                            name="name"
+                            onChange={this._handleFormFieldChange}
+                          />
+                          <TextField
+                            id="email"
+                            label="Email"
+                            defaultValue={this.props.user.email}
+                            margin="normal"
+                            variant="outlined"
+                            required
+                            placeholder="Give your email"
+                            helperText="change your email"
+                            name="email"
+                            type="email"
+                            onChange={this._handleFormFieldChange}
+                          />
+                          <Button
+                            variant="outlined"
+                            color="primary"
+                            type="submit">
+                            Save Changes
+                          </Button>
+                        </Box>
+                      </Form>
                     </Box>
-                  </Form>
-                </Box>
 
-                <Box direction="column" flex>
-                  <Form onSubmit={this.updateUserSecurity}>
                     <Box direction="column" flex>
-                      <TextField
-                        id="old_password"
-                        label="old password"
-                        defaultValue=""
-                        margin="normal"
-                        variant="outlined"
-                        required
-                        placeholder="your old password"
-                        helperText="Provide your old password"
-                        name="old_password"
-                        type="password"
-                        onChange={this._handleFormFieldChange}
-                      />
-                      <TextField
-                        id="new_password"
-                        label="new password"
-                        defaultValue=""
-                        margin="normal"
-                        variant="outlined"
-                        required
-                        placeholder="your new password"
-                        helperText="Provide your new password"
-                        name="new_password"
-                        type="password"
-                        onChange={this._handleFormFieldChange}
-                      />
-                      <TextField
-                        id="new_password_confirmation"
-                        label="new password again"
-                        defaultValue=""
-                        margin="normal"
-                        variant="outlined"
-                        required
-                        placeholder="your new password again"
-                        helperText="Provide your new password again"
-                        name="new_password_confirmation"
-                        type="password"
-                        onChange={this._handleFormFieldChange}
-                      />
-                      <Button variant="outlined" color="primary" type="submit">
-                        Change password
-                      </Button>
+                      <Form onSubmit={this.updateUserSecurity}>
+                        <Box direction="column" flex>
+                          <TextField
+                            id="old_password"
+                            label="old password"
+                            defaultValue=""
+                            margin="normal"
+                            variant="outlined"
+                            required
+                            placeholder="your old password"
+                            helperText="Provide your old password"
+                            name="old_password"
+                            type="password"
+                            onChange={this._handleFormFieldChange}
+                          />
+                          <TextField
+                            id="new_password"
+                            label="new password"
+                            defaultValue=""
+                            margin="normal"
+                            variant="outlined"
+                            required
+                            placeholder="your new password"
+                            helperText="Provide your new password"
+                            name="new_password"
+                            type="password"
+                            onChange={this._handleFormFieldChange}
+                          />
+                          <TextField
+                            id="new_password_confirmation"
+                            label="new password again"
+                            defaultValue=""
+                            margin="normal"
+                            variant="outlined"
+                            required
+                            placeholder="your new password again"
+                            helperText="Provide your new password again"
+                            name="new_password_confirmation"
+                            type="password"
+                            onChange={this._handleFormFieldChange}
+                          />
+                          <Button
+                            variant="outlined"
+                            color="primary"
+                            type="submit">
+                            Change password
+                          </Button>
+                        </Box>
+                      </Form>
                     </Box>
-                  </Form>
-                </Box>
-              </Box>
+                  </Box>
+                </Tab>
+                <Tab title="External Accounts">
+                  <Box fill direction="column">
+                    <Typography variant="display1">
+                      Manage account for the user
+                    </Typography>
+                    {/* create list of accounts connected and not connected + delete option */}
+                    {Object.keys(this.props.user.accounts).length != 0 && (
+                      <React.Fragment>
+                        <Typography variant="headline">
+                          Linked Accounts
+                        </Typography>
+                        <List>
+                          {Object.keys(this.props.user.accounts).map(
+                            (x: any) => (
+                              <ListItem key={x} alignItems="flex-start">
+                                <ListItemAvatar>
+                                  <Avatar alt={x}>{x.slice(0, 1)}</Avatar>
+                                </ListItemAvatar>
+                                <ListItemText
+                                  primary={x}
+                                  secondary={
+                                    <React.Fragment>
+                                      <Typography
+                                        component="span"
+                                        color="textPrimary">
+                                        Secret Token
+                                      </Typography>
+                                      {this.props.user.accounts[x].token}
+                                    </React.Fragment>
+                                  }
+                                />
+                                <ListItemSecondaryAction>
+                                  <IconButton aria-label="Delete">
+                                    <DeleteIcon />
+                                  </IconButton>
+                                </ListItemSecondaryAction>
+                              </ListItem>
+                            )
+                          )}
+                        </List>
+                      </React.Fragment>
+                    )}
+                    <Typography variant="headline">
+                      Available Accounts
+                    </Typography>
+                    <List>
+                      {accountsType.map((x: string) => {
+                        if (
+                          Object.keys(this.props.user.accounts).indexOf(x) ===
+                          -1
+                        )
+                          return (
+                            <ListItem key={x} role={undefined}>
+                              <ListItemAvatar>
+                                <Avatar>{x.slice(0, 1)}</Avatar>
+                              </ListItemAvatar>
+                              <ListItemText primary={x} />
+                              <ListItemSecondaryAction>
+                                {supportedAccounts.indexOf(x) != -1 ? (
+                                  <Button
+                                    color="primary"
+                                    onClick={() => {
+                                      x === "trello"
+                                        ? this.connectTrello()
+                                        : null;
+                                    }}>
+                                    Link Account
+                                  </Button>
+                                ) : (
+                                  <Button color="secondary" disabled>
+                                    Not supported yet
+                                  </Button>
+                                )}
+                              </ListItemSecondaryAction>
+                            </ListItem>
+                          );
+                      })}
+                    </List>
+                  </Box>
+                </Tab>
+              </Tabs>
             </Box>
           </DialogContent>
           <DialogActions>
@@ -272,9 +413,14 @@ const mapStateToProps = (state: any) => {
 
 const mapDispatchToProps = (dispatch: any) => {
   return {
+    startApprove: () => dispatch(startApproveAccount()),
+    endApproveAccount: () => dispatch(endApproveAccount()),
+    userActions: bindActionCreators(userActions, dispatch),
     openProfileManagement: () => dispatch(openProfileManagement()),
     closeProfileManagement: () => dispatch(closeProfileManagement()),
-    actions: bindActionCreators(userActions, dispatch)
+    actions: bindActionCreators(userActions, dispatch),
+    logout: (userToken: string, refreshToken: string) =>
+      dispatch(logout(userToken, refreshToken))
   };
 };
 

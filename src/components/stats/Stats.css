@@ -1,0 +1,50 @@
+.statBox {
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    min-height: 250px;
+    width: 100%;
+    border-left: 2px solid transparent;
+    padding-left: 3px;
+}
+
+.row-box {
+    display: flex;
+    flex-direction: row;
+}
+
+.half-size {
+    width: 50%;
+    max-width: 50%;
+}
+
+.col-box {
+    display: flex;
+    flex-direction: column;
+}
+
+.title {
+    text-transform: capitalize
+}
+
+.sub-title {
+    text-transform: capitalize;
+    color: rgba(255, 255, 255, .5)
+}
+
+.statBox .stat {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.statBox .dsc {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: center;
+}
+
+.statBox:hover {
+    border-left: 2px solid orange;
+}

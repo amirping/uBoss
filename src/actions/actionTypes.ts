@@ -6,6 +6,7 @@ export const SIGNUP_SUCCESS = "SIGNUP_SUCCESS";
 export const SIGNUP_ERROR = "SIGNUP_ERROR";
 export const LOGOUT = "LOGOUT";
 export const LOGOUT_SUCCESS = "LOGOUT_SUCCESS";
+export const LOGOUT_ERROR = "LOGOUT_ERROR";
 export const ADD_LIST = "ADD_LIST";
 export const IMPORT_LIST = "IMPORT_LIST";
 export const TOGGLE_SIDE = "TOGGLE_SIDE";
