@@ -1,6 +1,6 @@
 export default {
   dashboardsList: {
-    dashboardsIDs: [],
+    dashboardsIDs: null,
     dashboards: {}
   },
   loadedDashboard: {

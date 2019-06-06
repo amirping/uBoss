@@ -348,8 +348,12 @@ class Dashboards extends Component<any, DashboardsState> {
           border={{ side: "top" }}
           margin={{ top: "small" }}
           pad={{ top: "small" }}>
-          {this.props.dashboardsIds && this.props.dashboardsIds.length !== 0 ? (
+          {this.props.dashboardsIds != null &&
+          this.props.dashboardsIds.length !== 0 ? (
             <this.DashsRender />
+          ) : this.props.dashboardsIds != null &&
+            this.props.dashboardsIds.length === 0 ? (
+            <span>No Boards</span>
           ) : (
             <CircularProgress color="secondary" style={{ margin: "auto" }} />
           )}

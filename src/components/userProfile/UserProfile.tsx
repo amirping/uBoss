@@ -315,50 +315,52 @@ class UserProfile extends Component<any, UserProfileState> {
                       Manage account for the user
                     </Typography>
                     {/* create list of accounts connected and not connected + delete option */}
-                    {Object.keys(this.props.user.accounts).length != 0 && (
-                      <React.Fragment>
-                        <Typography variant="headline">
-                          Linked Accounts
-                        </Typography>
-                        <List>
-                          {Object.keys(this.props.user.accounts).map(
-                            (x: any) => (
-                              <ListItem key={x} alignItems="flex-start">
-                                <ListItemAvatar>
-                                  <Avatar alt={x}>{x.slice(0, 1)}</Avatar>
-                                </ListItemAvatar>
-                                <ListItemText
-                                  primary={x}
-                                  secondary={
-                                    <React.Fragment>
-                                      <Typography
-                                        component="span"
-                                        color="textPrimary">
-                                        Secret Token
-                                      </Typography>
-                                      {this.props.user.accounts[x].token}
-                                    </React.Fragment>
-                                  }
-                                />
-                                <ListItemSecondaryAction>
-                                  <IconButton aria-label="Delete">
-                                    <DeleteIcon />
-                                  </IconButton>
-                                </ListItemSecondaryAction>
-                              </ListItem>
-                            )
-                          )}
-                        </List>
-                      </React.Fragment>
-                    )}
+                    {this.props.user.accounts != null &&
+                      Object.keys(this.props.user.accounts).length != 0 && (
+                        <React.Fragment>
+                          <Typography variant="headline">
+                            Linked Accounts
+                          </Typography>
+                          <List>
+                            {Object.keys(this.props.user.accounts).map(
+                              (x: any) => (
+                                <ListItem key={x} alignItems="flex-start">
+                                  <ListItemAvatar>
+                                    <Avatar alt={x}>{x.slice(0, 1)}</Avatar>
+                                  </ListItemAvatar>
+                                  <ListItemText
+                                    primary={x}
+                                    secondary={
+                                      <React.Fragment>
+                                        <Typography
+                                          component="span"
+                                          color="textPrimary">
+                                          Secret Token
+                                        </Typography>
+                                        {this.props.user.accounts[x].token}
+                                      </React.Fragment>
+                                    }
+                                  />
+                                  <ListItemSecondaryAction>
+                                    <IconButton aria-label="Delete">
+                                      <DeleteIcon />
+                                    </IconButton>
+                                  </ListItemSecondaryAction>
+                                </ListItem>
+                              )
+                            )}
+                          </List>
+                        </React.Fragment>
+                      )}
                     <Typography variant="headline">
                       Available Accounts
                     </Typography>
                     <List>
                       {accountsType.map((x: string) => {
                         if (
+                          this.props.user.accounts &&
                           Object.keys(this.props.user.accounts).indexOf(x) ===
-                          -1
+                            -1
                         )
                           return (
                             <ListItem key={x} role={undefined}>
