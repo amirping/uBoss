@@ -38,6 +38,7 @@ import {
   Sector
 } from "recharts";
 import Stats from "../stats/Stats";
+import RtApi from "../../api/rtApi";
 export interface DashboardProps {}
 
 export interface DashboardState {
@@ -47,13 +48,22 @@ export interface DashboardState {
 class Dashboard extends Component<any, DashboardState> {
   _cardsData: any = []; // no need
   inputSearch: any;
+  socket: any;
   constructor(props: any) {
     super(props);
     this.inputSearch = React.createRef();
   }
   componentDidMount() {
     console.log("mounted dashboard");
+    this.socket = new RtApi(
+      this.props.user.accounts["trello"].token,
+      "352af8ad953a870235a0e23bcbdbea3d"
+    );
+    this.socket.socket.on("UPDATE_DATA", (data: any) => {
+      this.props.actions_card.loadCards(this.props.dashboard_data);
+    });
   }
+
   handleClear = () => {
     this.inputSearch.current.value = "";
     this.props.actions_card.searchCard(this.inputSearch.current.value);
@@ -138,11 +148,12 @@ class Dashboard extends Component<any, DashboardState> {
       });
     }
   };
-  componentDidUpdate() {
+  componentDidUpdate(prevProps: any, prevState: any) {
     console.log("UPDATE DASHBOARD - COMP");
     // get cards from remote boards and send each card for her list display
     // add socket here to notify whene we need to retrive data again
     //this.cardsLoader();
+    this.socket.askWatch(this.props.cards);
   }
   getRemoteListDistination = (
     idCard: string,

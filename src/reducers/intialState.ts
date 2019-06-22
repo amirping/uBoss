@@ -9,6 +9,7 @@ export default {
     moreCardData: null,
     selectedDashboardData: null,
     cards: null,
+    rawCards: [],
     searchCard: "",
     stats: null,
     viewConfig: {

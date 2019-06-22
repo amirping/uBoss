@@ -24,6 +24,7 @@ Promise.all([p1, p2]).then(values => {
 })
   */
 export function loadCards(dashboard_data: any) {
+  console.log("call me maybe");
   let jobTodo = 0;
   let jobDone = 0;
   dashboard_data.importedDashboards.map((ImportedDash: any) => {
